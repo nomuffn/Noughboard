@@ -35,10 +35,10 @@
         <template #footer>
             <Button
                 v-if="block.id"
-                label="Delete"
+                :label="deleteCounter == 0 ? 'Delete' : 'Really?'"
                 icon="pi pi-trash"
                 class="p-button-danger flex-start"
-                @click="$emit('delete')"
+                @click="deleteBlock()"
             />
             <Button
                 label="Discard"
@@ -88,6 +88,16 @@ const showAdd = computed(() => {
     if (values.some((value) => !value || !value.length)) return false
     return true
 })
+
+let deleteCounter = ref(0)
+const deleteBlock = () => {
+    if (deleteCounter.value == 0) {
+        deleteCounter.value++
+    } else {
+        this.$emit('delete')
+        deleteCounter.value = 0
+    }
+}
 
 watch(
     () => props.block.block,
