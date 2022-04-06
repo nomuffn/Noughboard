@@ -1,0 +1,20 @@
+#app {
+}
+header {
+    margin: 5px;
+}
+.list {
+    display: flex;
+    flex-wrap: wrap;
+
+    > .card {
+        // flex: 1;
+        margin: 5px;
+        transition: all 0.25s;
+        cursor: pointer;
+
+        &:hover {
+            filter: brightness(85%);
+        }
+    }
+}

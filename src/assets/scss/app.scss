@@ -1,12 +1,14 @@
 /* color palette from <https://github.com/vuejs/theme> */
 
-@import "./components/card.scss";
+@import './base/layout.scss';
+@import './base/overrides.scss';
+@import './components/card.scss';
 
 #app {
     max-width: 1280px;
     margin: 0 auto;
     padding: 2rem;
- 
+
     font-weight: normal;
 
     font-family: Avenir, Helvetica, Arial, sans-serif;

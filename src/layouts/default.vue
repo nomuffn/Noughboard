@@ -6,7 +6,7 @@ import { RouterLink, RouterView } from 'vue-router'
     <RouterView />
 </template>
 
-<style style="scss">
+<style lang="scss">
 /* https://www.primefaces.org/primevue/#/setup */
 @import 'primevue/resources/themes/bootstrap4-dark-blue/theme.css';
 @import 'primevue/resources/primevue.min.css';

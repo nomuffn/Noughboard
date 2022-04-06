@@ -1,7 +1,12 @@
 export { default as List } from './List.vue'
-export const options = [
+
+export const allBlocks = [
     {
-        name: 'Data Fetcher',
-        code: 'dataFetcher',
+        name: 'Text', //from result: one variable, foreach variable, array
+        code: 'text',
+    },
+    {
+        name: 'Lambda', //from result: one variable, foreach variable, array
+        code: 'lambda',
     },
 ]
