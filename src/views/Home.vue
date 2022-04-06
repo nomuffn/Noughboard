@@ -1,12 +1,11 @@
 <template>
     <header>
         <div class="card">
-            <Button icon="pi pi-plus" @click="editBlock()" />
+            <Button icon="pi pi-plus" @click="addBlock()" />
         </div>
     </header>
 
     <div class="list">
-        <!-- wrapper -->
         <BlocksWrapper :blocks="blocks" @edit-block="(event) => editBlock(event)" />
     </div>
 
@@ -40,6 +39,7 @@ const blocks = useObservable(liveQuery(() => db.blocks.toArray()))
 const resetBlock = () => {
     blockToEdit.block = null
     blockToEdit.inputValues = {}
+    blockToEdit.id = null
 }
 
 // Edit Modal
@@ -51,7 +51,13 @@ watch(
         }
     },
 )
-const editBlock = (event = {}) => {
+
+const addBlock = () => {
+    //object assignment & proxies weird, couldnt combine these two methods
+    resetBlock()
+    modal.visible = true
+}
+const editBlock = (event) => {
     Object.assign(blockToEdit, event)
     modal.visible = true
 }

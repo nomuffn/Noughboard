@@ -3,8 +3,8 @@
         <div class="view" v-if="!edit">
             <ProgressSpinner v-if="loading" style="height: 3rem" />
             <div class="result" v-else-if="Object.keys(result).length">
-                <!-- move all of this to an extra lambda wrapper/render component? -->
                 <div v-for="item in result" :key="item.type + item.value">
+                    <!-- move all of this to an extra lambda wrapper/render component? -->
                     <template v-if="item.type == 'text'">
                         <p :style="item.style">{{ item.value }}</p>
                     </template>
@@ -18,7 +18,7 @@
         <div class="edit" v-else>
             <ScriptEditor v-model="input.lambda" />
             <Button
-                label="Check code"
+                label="Test run code"
                 icon="pi pi-check"
                 class="p-button-outlined"
                 @click="checkCode()"
