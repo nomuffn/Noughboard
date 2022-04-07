@@ -5,7 +5,7 @@ import App from './App.vue'
 import router from './router'
 
 import PrimeVue from 'primevue/config'
-import ToastService from 'primevue/toastservice';
+import ToastService from 'primevue/toastservice'
 import VueGridLayout from 'vue-grid-layout'
 
 const app = createApp(App)
@@ -15,7 +15,7 @@ app.use(router)
 app.use(VueGridLayout)
 
 app.use(PrimeVue)
-app.use(ToastService);
+app.use(ToastService)
 
 app.mount('#app', { ripple: true })
 
@@ -26,9 +26,10 @@ import Dropdown from 'primevue/dropdown'
 import Card from 'primevue/card'
 import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
-import Toast from 'primevue/toast';
-import ProgressBar from 'primevue/progressbar';
-import ProgressSpinner from 'primevue/progressspinner';
+import Toast from 'primevue/toast'
+import ProgressBar from 'primevue/progressbar'
+import ProgressSpinner from 'primevue/progressspinner'
+import InputNumber from 'primevue/inputnumber'
 app.component('Button', Button)
 app.component('Dialog', Dialog)
 app.component('Dropdown', Dropdown)
@@ -38,3 +39,4 @@ app.component('Textarea', Textarea)
 app.component('Toast', Toast)
 app.component('ProgressBar', ProgressBar)
 app.component('ProgressSpinner', ProgressSpinner)
+app.component('InputNumber', InputNumber)
