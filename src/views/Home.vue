@@ -31,9 +31,7 @@ import EditBlockModal from '../components/EditBlockModal.vue'
 import { allBlocks } from '../components/blocks'
 
 const modal = reactive({ visible: false })
-
 const blockToEdit = reactive({ block: null, inputValues: {} })
-
 const blocks = useObservable(liveQuery(() => db.blocks.toArray()))
 
 const resetBlock = () => {
@@ -62,6 +60,8 @@ const editBlock = (event) => {
     modal.visible = true
 }
 const saveBlock = () => {
+    //remove inputvales from other blocks that mightve gotten filled before while editing
+
     //cringe proxies
     let newBlock = {
         block: { ...blockToEdit.block },

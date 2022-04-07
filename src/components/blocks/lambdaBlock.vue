@@ -55,6 +55,7 @@ import {
 import ScriptEditor from '../ScriptEditor.vue'
 import { useToast } from 'primevue/usetoast'
 import axios from 'axios'
+import { Lambda, defaultLambda } from '@/lib/lambda'
 
 const props = defineProps({
     edit: Boolean,
@@ -76,8 +77,7 @@ const runCode = async () => {
     if (!props.edit) {
         loading.value = true
         try {
-            const test = new AsyncFunction(props.input.lambda)
-            const res = await test()
+            const res = await new Lambda(props.input.lambda).run()
             Object.assign(result, res)
             console.log(res)
         } catch (e) {
@@ -90,32 +90,34 @@ const runCode = async () => {
 
 onBeforeMount(() => {})
 onMounted(async () => {
-    await runCode()
+    if (!props.input.lambda) props.input.lambda = defaultLambda
 
-    const interval = props.input.repeat
-    if (!isNaN(interval) && interval > 0) {
-        setInterval(function () {
-            remainingTime.value = 0
-            runCode()
-        }, interval * 1000 * 60)
-        setInterval(function () {
-            remainingTime.value += 1
-        }, 1000)
+    if (!props.edit) {
+        await runCode()
+
+        const interval = props.input.repeat
+        if (!isNaN(interval) && interval > 0) {
+            setInterval(function () {
+                remainingTime.value = 0
+                runCode()
+            }, interval * 1000 * 60)
+            setInterval(function () {
+                remainingTime.value += 1
+            }, 1000)
+        }
     }
 })
 
-watch(
-    () => props.input.lambda,
-    () => {
-        runCode()
-    },
-)
+// watch(
+//     () => props.input.lambda,
+//     () => {
+//         runCode()
+//     },
+// )
 
-const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor
 const checkCode = async () => {
     try {
-        const test = new AsyncFunction(props.input.lambda)
-        const result = await test()
+        const result = await new Lambda(props.input.lambda).run()
         toast.add({
             severity: 'info',
             summary: 'Result is:',
