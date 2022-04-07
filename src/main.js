@@ -1,12 +1,12 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-
 import App from './App.vue'
 import router from './router'
-
 import PrimeVue from 'primevue/config'
 import ToastService from 'primevue/toastservice'
 import VueGridLayout from 'vue-grid-layout'
+import axios from 'axios'
+import VueAxios from 'vue-axios'
 
 const app = createApp(App)
 
@@ -16,6 +16,9 @@ app.use(VueGridLayout)
 
 app.use(PrimeVue)
 app.use(ToastService)
+
+app.use(VueAxios, axios)
+app.provide('axios', app.config.globalProperties.axios)
 
 app.mount('#app', { ripple: true })
 

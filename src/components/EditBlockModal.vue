@@ -70,30 +70,28 @@ import { liveQuery } from 'dexie'
 import { useObservable } from '@vueuse/rxjs'
 import { allBlocks } from './blocks'
 
-const emits = defineEmits(['save', 'delete'])
+const emit = defineEmits(['save', 'delete'])
 const props = defineProps({
     modalOptions: Object,
     block: Object,
 })
 
+const deleteCounter = ref(0)
 const vueBlock = shallowRef()
-
 const blocks = useObservable(liveQuery(() => db.blocks.toArray()))
 
 const showAdd = computed(() => {
-    console.log(props.block.inputValues)
     const keys = Object.keys(props.block.inputValues)
     const values = Object.values(props.block.inputValues)
     if (!keys.length) return false
     return true
 })
 
-let deleteCounter = ref(0)
 const deleteBlock = () => {
     if (deleteCounter.value == 0) {
         deleteCounter.value++
     } else {
-        this.$emit('delete')
+        emit('delete')
         deleteCounter.value = 0
     }
 }
@@ -106,7 +104,6 @@ watch(
         }
     },
 )
-
 watch(
     () => props.block.block,
     (newval, oldval) => {
