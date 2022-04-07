@@ -2,7 +2,7 @@
     <Dialog
         v-model:visible="props.modalOptions.visible"
         :dismissableMask="true"
-        :style="{ maxWidth: '90vw' }"
+        :style="{ maxWidth: '800px', width: '100%' }"
         :modal="true"
         :closable="true"
         :draggable="false"
@@ -21,7 +21,6 @@
         />
 
         <template v-if="block.block">
-            <h4>Options</h4>
             <div class="options">
                 <component
                     v-if="vueBlock"
@@ -82,10 +81,10 @@ const vueBlock = shallowRef()
 const blocks = useObservable(liveQuery(() => db.blocks.toArray()))
 
 const showAdd = computed(() => {
+    console.log(props.block.inputValues)
     const keys = Object.keys(props.block.inputValues)
     const values = Object.values(props.block.inputValues)
     if (!keys.length) return false
-    if (values.some((value) => !value || !value.length)) return false
     return true
 })
 
@@ -98,6 +97,15 @@ const deleteBlock = () => {
         deleteCounter.value = 0
     }
 }
+
+watch(
+    () => props.modalOptions.visible,
+    (newval, oldval) => {
+        if (!newval) {
+            deleteCounter.value = 0
+        }
+    },
+)
 
 watch(
     () => props.block.block,
@@ -120,8 +128,10 @@ watch(
     .p-dialog-content > * {
         margin-bottom: 10px;
     }
-    .options > * {
-        margin-bottom: 10px;
+    .options {
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid #3f4b5b;
     }
 }
 </style>

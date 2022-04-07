@@ -9,6 +9,9 @@
                         <p :style="item.style">{{ item.value }}</p>
                     </template>
                 </div>
+                <p class="remaining" v-if="input.repeat > 0">
+                    Runs again in {{ getRemainingTime() }}
+                </p>
             </div>
 
             <div v-else>error</div>
@@ -16,6 +19,18 @@
             <!-- render lambda result; array of extra blocks to render? text, lists, images whatever -->
         </div>
         <div class="edit" v-else>
+            <label for="minmax-buttons"
+                >(Optional) Run every x minutes after the initial render</label
+            >
+            <InputNumber
+                id="minmax-buttons"
+                v-model="input.repeat"
+                mode="decimal"
+                showButtons
+                :min="0"
+                :max="100"
+            />
+
             <ScriptEditor v-model="input.lambda" />
             <Button
                 label="Test run code"
@@ -29,7 +44,14 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref, watch } from '@vue/runtime-core'
+import {
+    computed,
+    onMounted,
+    reactive,
+    ref,
+    watch,
+    onBeforeMount,
+} from '@vue/runtime-core'
 import ScriptEditor from '../ScriptEditor.vue'
 import { useToast } from 'primevue/usetoast'
 import axios from 'axios'
@@ -42,6 +64,13 @@ const toast = useToast()
 
 const loading = ref(true)
 const result = reactive({})
+const remainingTime = ref(0)
+const getRemainingTime = () => {
+    const seconds = 60 * props.input.repeat - remainingTime.value
+    const remaining = Math.round(seconds / 60, 0)
+    if (remaining <= 1) return `${seconds} s`
+    return `${remaining} m`
+}
 
 const runCode = async () => {
     if (!props.edit) {
@@ -59,8 +88,20 @@ const runCode = async () => {
     }
 }
 
+onBeforeMount(() => {})
 onMounted(async () => {
-    runCode()
+    await runCode()
+
+    const interval = props.input.repeat
+    if (!isNaN(interval) && interval > 0) {
+        setInterval(function () {
+            remainingTime.value = 0
+            runCode()
+        }, interval * 1000 * 60)
+        setInterval(function () {
+            remainingTime.value += 1
+        }, 1000)
+    }
 })
 
 watch(
@@ -85,7 +126,7 @@ const checkCode = async () => {
     } catch (e) {
         toast.add({
             severity: 'error',
-            summary: 'Error inc ode',
+            summary: 'Error in code',
             detail: e,
         })
         console.log(e)
@@ -97,13 +138,38 @@ const checkCode = async () => {
 
 <style lang="scss">
 .lambdaBlock {
+    .view {
+        .remaining {
+            opacity: 0.5;
+            position: absolute;
+            right: -15px;
+            font-size: 80%;
+            bottom: -20px;
+        }
+    }
     .edit {
-        width: 80vw;
+        display: flex;
+        flex-direction: column;
+        max-width: 800px;
+        width: 100%;
+        padding-left: 15px;
+
+        > * {
+            margin-bottom: 15px;
+        }
+
         .scripteditor {
             margin-bottom: 20px;
+            margin-left: -15px;
         }
         button {
-            float: right;
+            align-self: flex-end;
+        }
+        label {
+            margin-bottom: 5px;
+        }
+        .p-inputnumber input {
+            max-width: 100px;
         }
     }
 }
