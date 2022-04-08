@@ -4,7 +4,7 @@
         :dismissableMask="true"
         :style="{ maxWidth: '800px', width: '100%' }"
         :modal="true"
-        :closable="true"
+        :closable="false"
         :draggable="false"
         class="editBlockModal"
     >
@@ -36,7 +36,7 @@
                 v-if="block.id"
                 :label="deleteCounter == 0 ? 'Delete' : 'Really?'"
                 icon="pi pi-trash"
-                class="p-button-danger flex-start"
+                class="delet p-button-danger flex-start"
                 @click="deleteBlock()"
             />
             <Button
@@ -129,6 +129,15 @@ watch(
         margin-top: 10px;
         padding-top: 10px;
         border-top: 1px solid #3f4b5b;
+    }
+    .p-dialog-footer {
+        display: flex;
+        align-items: flex-end;
+        justify-content: flex-end;
+
+        .delet {
+            margin-right: auto;
+        }
     }
 }
 </style>
