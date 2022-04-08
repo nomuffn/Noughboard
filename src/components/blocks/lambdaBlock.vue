@@ -141,6 +141,11 @@ const checkCode = async () => {
 <style lang="scss">
 .lambdaBlock {
     .view {
+        .result {
+            div p {
+                min-height: 1rem;
+            }
+        }
         .remaining {
             opacity: 0.5;
             position: absolute;
