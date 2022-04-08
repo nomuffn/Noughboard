@@ -117,11 +117,16 @@ onMounted(async () => {
 
 const checkCode = async () => {
     try {
-        const result = await new Lambda(props.input.lambda).run()
+        let result = await new Lambda(props.input.lambda).run()
+        let resultJson = JSON.stringify(result)
+        let toastMessage = '...too long, check console logs 🤓'
+        if (resultJson.length <= 500) {
+            toastMessage = resultJson
+        }
         toast.add({
             severity: 'info',
             summary: 'Result is:',
-            detail: result,
+            detail: toastMessage,
             life: 5000,
         })
         console.log(result)
