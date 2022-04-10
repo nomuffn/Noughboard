@@ -33,6 +33,7 @@ import Toast from 'primevue/toast'
 import ProgressBar from 'primevue/progressbar'
 import ProgressSpinner from 'primevue/progressspinner'
 import InputNumber from 'primevue/inputnumber'
+
 app.component('Button', Button)
 app.component('Dialog', Dialog)
 app.component('Dropdown', Dropdown)
