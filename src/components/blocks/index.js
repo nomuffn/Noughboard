@@ -2,7 +2,7 @@ export { default as List } from './List.vue'
 
 export const allBlocks = [
     {
-        name: 'Text', //from result: one variable, foreach variable, array
+        name: 'Note', //from result: one variable, foreach variable, array
         code: 'text',
     },
     {
