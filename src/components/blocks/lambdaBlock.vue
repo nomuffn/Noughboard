@@ -153,10 +153,9 @@ const checkCode = async () => {
         }
         .remaining {
             opacity: 0.5;
-            position: absolute;
-            right: -15px;
             font-size: 80%;
-            bottom: -20px;
+            margin-bottom: -10px;
+            float: right;
         }
     }
     .edit {

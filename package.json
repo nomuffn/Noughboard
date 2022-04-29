@@ -10,6 +10,7 @@
     "@vueuse/rxjs": "^8.2.3",
     "axios": "^0.26.1",
     "dexie": "^3.2.1",
+    "lodash": "^4.17.21",
     "pinia": "^2.0.11",
     "primeicons": "^5.0.0",
     "primevue": "^3.12.4",

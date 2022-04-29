@@ -14,18 +14,18 @@
 
         <h4>Block</h4>
         <Dropdown
-            v-model="block.block"
+            v-model="data.block.block"
             :options="allBlocks"
             optionLabel="name"
             placeholder="Select a block"
         />
 
-        <template v-if="block.block">
+        <template v-if="data.block.block">
             <div class="options">
                 <component
                     v-if="vueBlock"
                     :is="vueBlock"
-                    :input="block.inputValues"
+                    :input="data.block.inputValues"
                     :edit="true"
                 />
             </div>
@@ -33,7 +33,7 @@
 
         <template #footer>
             <Button
-                v-if="block.id"
+                v-if="data.block.id"
                 :label="deleteCounter == 0 ? 'Delete' : 'Really?'"
                 icon="pi pi-trash"
                 class="delet p-button-danger flex-start"
@@ -49,7 +49,7 @@
                 label="Save"
                 icon="pi pi-check"
                 :disabled="showAdd != true"
-                @click="$emit('save')"
+                @click="$emit('save', data.block)"
             />
         </template>
     </Dialog>
@@ -64,6 +64,7 @@ import {
     shallowRef,
     computed,
     defineAsyncComponent,
+    onMounted,
 } from 'vue' //ref for primitives, reactive for objects
 import { db } from '../lib/db'
 import { liveQuery } from 'dexie'
@@ -76,42 +77,61 @@ const props = defineProps({
     block: Object,
 })
 
-const deleteCounter = ref(0)
+const data = reactive({ block: { block: allBlocks[0], inputValues: {} } })
+
+const deleteCounter = ref(false)
 const vueBlock = shallowRef()
 const blocks = useObservable(liveQuery(() => db.blocks.toArray()))
 
 const showAdd = computed(() => {
-    const keys = Object.keys(props.block.inputValues)
-    const values = Object.values(props.block.inputValues)
+    if (!data.block.inputValues) return false
+    const keys = Object.keys(data.block.inputValues)
+    const values = Object.values(data.block.inputValues)
     if (!keys.length) return false
     return true
 })
 
 const deleteBlock = () => {
-    if (deleteCounter.value == 0) {
-        deleteCounter.value++
+    if (!deleteCounter.value) {
+        deleteCounter.value = true
     } else {
-        emit('delete')
-        deleteCounter.value = 0
+        emit('delete', data.block)
+        deleteCounter.value = false
     }
 }
+
+const loadBLock = () => {
+    const blockCode = data.block.block.code
+    vueBlock.value = defineAsyncComponent(() =>
+        import(`../components/blocks/${blockCode}Block.vue`),
+    )
+}
+
+onMounted(() => {
+    loadBLock()
+})
 
 watch(
     () => props.modalOptions.visible,
     (newval, oldval) => {
-        if (!newval) {
+        if (newval == true) {
+            console.log(props)
+            if (props.block != null) {
+                data.block = { ...props.block }
+            }
+        } else {
+            console.log(1)
+
+            data.block = { block: {}, inputValues: {} }
             deleteCounter.value = 0
         }
     },
 )
 watch(
-    () => props.block.block,
+    () => data.block.block,
     (newval, oldval) => {
         if (!newval) return
-        const blockCode = props.block.block.code
-        vueBlock.value = defineAsyncComponent(() =>
-            import(`../components/blocks/${blockCode}Block.vue`),
-        )
+        loadBLock()
     },
 )
 </script>
