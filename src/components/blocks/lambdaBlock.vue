@@ -3,15 +3,13 @@
         <div class="view" v-if="!edit">
             <ProgressSpinner v-if="loading" style="height: 3rem" />
             <div class="result" v-else-if="Object.keys(result).length">
+                <p class="remaining" v-if="input.repeat > 0">~{{ getRemainingTime() }}</p>
                 <div v-for="item in result" :key="item.type + item.value">
                     <!-- move all of this to an extra lambda wrapper/render component? -->
                     <template v-if="item.type == 'text'">
                         <p :style="item.style">{{ item.value }}</p>
                     </template>
                 </div>
-                <p class="remaining" v-if="input.repeat > 0">
-                    Runs again in {{ getRemainingTime() }}
-                </p>
             </div>
 
             <div v-else>error</div>
@@ -153,9 +151,10 @@ const checkCode = async () => {
         }
         .remaining {
             opacity: 0.5;
-            font-size: 80%;
-            margin-bottom: -10px;
-            float: right;
+            font-size: 70%;
+            position: absolute;
+            top: -15px;
+            right: -14px;
         }
     }
     .edit {

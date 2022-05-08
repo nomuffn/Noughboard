@@ -95,6 +95,7 @@ const saveBlock = async (block) => {
 const deleteBlock = (block) => {
     db.blocks.delete(block.id)
     modal.visible = false
+    loadBlocks()
 }
 </script>
 <style lang="scss"></style>
