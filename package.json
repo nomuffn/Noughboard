@@ -7,6 +7,8 @@
     "preview": "vite preview --port 5050"
   },
   "dependencies": {
+    "@tiptap/starter-kit": "*",
+    "@tiptap/vue-3": "*",
     "@vueuse/rxjs": "^8.2.3",
     "axios": "^0.26.1",
     "dexie": "^3.2.1",
@@ -15,6 +17,7 @@
     "primeicons": "^5.0.0",
     "primevue": "^3.12.4",
     "prismjs": "^1.27.0",
+    "remixicon": "^2.5.0",
     "rxjs": "^7.5.5",
     "vue": "^3.2.31",
     "vue-axios": "^3.4.1",

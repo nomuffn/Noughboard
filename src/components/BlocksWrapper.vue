@@ -2,8 +2,8 @@
     <grid-layout
         v-model:layout="blocks"
         ref="gridlayout"
-        :col-num="10"
-        :row-height="30"
+        :col-num="20"
+        :row-height="17"
         :margin="[10, 10]"
         :use-css-transforms="true"
         :vertical-compact="false"
@@ -54,14 +54,6 @@ const layoutUpdatedEvent = throttle(() => {
     //     life: 2000,
     // })
 }, 1000 * 1)
-
-const layout = reactive([
-    { x: 0, y: 0, w: 2, h: 2, i: '0' },
-    { x: 2, y: 0, w: 2, h: 4, i: '1' },
-    { x: 4, y: 0, w: 2, h: 5, i: '2' },
-    { x: 6, y: 0, w: 2, h: 3, i: '3' },
-    { x: 8, y: 0, w: 2, h: 3, i: '4' },
-])
 </script>
 
 <style lang="scss">

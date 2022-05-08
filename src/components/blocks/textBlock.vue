@@ -1,13 +1,16 @@
 <template>
     <div class="textBlock" v-if="!edit">
-        <p><pre>{{ input.text }}</pre></p>
+        <div v-html="input.text" />
     </div>
     <div v-else>
-        <Textarea type="text" v-model="input.text" />
+        <Editor v-model="input.text" />
     </div>
 </template>
 
 <script setup>
+import { reactive } from '@vue/reactivity'
+import Editor from '../TextEditor.vue'
+
 console.log('setup')
 
 defineProps({
@@ -18,7 +21,11 @@ defineProps({
 
 <style lang="scss">
 .textBlock {
-    max-width: 500px;
     min-width: 200px;
+
+    p {
+        white-space: pre-line;
+        min-height: 1.5rem;
+    }
 }
 </style>

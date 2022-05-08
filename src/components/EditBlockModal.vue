@@ -77,7 +77,8 @@ const props = defineProps({
     block: Object,
 })
 
-const data = reactive({ block: { block: allBlocks[0], inputValues: {} } })
+const defaultBlock = { block: allBlocks[0], inputValues: {} }
+const data = reactive({ block: defaultBlock })
 
 const deleteCounter = ref(false)
 const vueBlock = shallowRef()
@@ -101,13 +102,15 @@ const deleteBlock = () => {
 }
 
 const loadBLock = () => {
-    const blockCode = data.block.block.code
+    const blockCode = data.block?.block?.code
+    if (!blockCode) return
     vueBlock.value = defineAsyncComponent(() =>
         import(`../components/blocks/${blockCode}Block.vue`),
     )
 }
 
 onMounted(() => {
+    console.log('mounted')
     loadBLock()
 })
 
@@ -122,7 +125,7 @@ watch(
         } else {
             console.log(1)
 
-            data.block = { block: {}, inputValues: {} }
+            data.block = defaultBlock
             deleteCounter.value = 0
         }
     },
@@ -131,6 +134,7 @@ watch(
     () => data.block.block,
     (newval, oldval) => {
         if (!newval) return
+        console.log('watch')
         loadBLock()
     },
 )
