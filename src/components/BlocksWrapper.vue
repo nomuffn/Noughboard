@@ -1,15 +1,14 @@
 <template>
     <grid-layout
-        v-model:layout="blocks"
-        ref="gridlayout"
-        :col-num="20"
-        :row-height="17"
-        :margin="[10, 10]"
-        :use-css-transforms="true"
-        :vertical-compact="false"
+        :layout.sync="blocks"
+        :col-num="colNum"
+        :row-height="30"
         :is-draggable="true"
         :is-resizable="true"
-        @layout-updated="(i) => layoutUpdatedEvent()"
+        :vertical-compact="true"
+        :margin="[10, 10]"
+        :use-css-transforms="true"
+        @layout-updated="layoutUpdatedEvent"
     >
         <grid-item
             v-for="item in blocks"
@@ -21,9 +20,8 @@
             :key="item.i"
         >
             <div
-                class="card"
-                :key="item.id"
-                @contextmenu.prevent="$emit('editBlock', item)"
+                class="bg-slate-800 rounded-md h-full w-full p-4 overflow-auto"
+                @contextmenu.prevent="() => editBlock(item)"
             >
                 <BasicBlock :block="item" />
             </div>
@@ -31,32 +29,66 @@
     </grid-layout>
 </template>
 
-<script setup>
-import { ref, reactive, defineAsyncComponent } from 'vue' //ref for primitives, reactive for objects
-import BasicBlock from './blocks/BasicBlock.vue'
-import { db } from '../lib/db'
-import Dexie from 'dexie'
-import { throttle } from 'lodash'
-import { useToast } from 'primevue/usetoast'
+<script>
+import VueGridLayout from 'vue-grid-layout'
+import { db } from '@/lib/db'
+import BasicBlock from '@/components/blocks/BasicBlock.vue'
+import EditBlockModal from '@/components/modals/EditBlockModal.vue'
 
-defineEmits(['editBlock'])
-const props = defineProps({
-    blocks: Array,
-})
-const toast = useToast()
+export default {
+    components: {
+        GridLayout: VueGridLayout.GridLayout,
+        GridItem: VueGridLayout.GridItem,
+        BasicBlock,
+    },
+    props: {
+        blocks: {
+            required: true,
+            type: Array,
+        },
+    },
+    created() {
+        if (!localStorage.getItem('colNum')) {
+            localStorage.setItem('colNum', 20)
+        }
 
-const layoutUpdatedEvent = throttle(() => {
-    console.log('save')
-    db.blocks.bulkPut(Dexie.deepClone(props.blocks))
-    // toast.add({
-    //     severity: 'info',
-    //     summary: 'Saving...',
-    //     life: 2000,
-    // })
-}, 1000 * 1)
+        this.colNum = parseInt(localStorage.getItem('colNum'))
+    },
+    data() {
+        return {
+            colNum: 20,
+        }
+    },
+    methods: {
+        layoutUpdatedEvent() {
+            console.log('save')
+            db.blocks.bulkPut(this.blocks)
+        },
+        editBlock(item) {
+            this.$buefy.modal.open({
+                parent: this,
+                component: EditBlockModal,
+                hasModalCard: true,
+                trapFocus: true,
+                props: { item },
+                events: {
+                    close: () => {
+                        this.$emit('update')
+                    },
+                },
+            })
+        },
+    },
+}
 </script>
 
 <style lang="scss">
+.vue-grid-layout {
+    margin: 0px 5px;
+}
+.vue-grid-item {
+    touch-action: none;
+}
 .vue-resizable-handle {
     background: none !important;
     border: solid grey;

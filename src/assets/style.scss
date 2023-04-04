@@ -1,11 +1,17 @@
-/* color palette from <https://github.com/vuejs/theme> */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@import './base/layout.scss';
-@import './base/overrides.scss';
-@import './components/card.scss';
+// https://buefy.org/documentation/customization
+// variables: https://bulma.io/documentation/overview/variables/
+// @import './scss/bulma.scss';
+@import './scss/bulma-dark-theme.scss';
 
 #app {
-    max-width: 1280px;
+    min-height: 100vh;
+    color: #fff;
+
+    max-width: 1920px;
     margin: 0 auto;
     padding: 2rem;
 
@@ -18,7 +24,6 @@
 
 html {
     font-size: 16px;
-    background-color: var(--surface-ground);
 }
 
 *,
@@ -32,8 +37,7 @@ html {
 
 body {
     font-family: var(--font-family);
-    color: var(--text-color);
-    background-color: var(--surface-ground);
+    color: #fff;
 
     box-sizing: border-box;
     overflow-x: hidden;
@@ -42,13 +46,4 @@ body {
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-    text-decoration: none;
-    color: var(--primary-color);
-}
-
-.layout-theme-light {
-    background-color: #edf1f5;
 }

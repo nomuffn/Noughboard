@@ -1,0 +1,32 @@
+@import '~bulma/sass/utilities/_all';
+
+// Set your colors
+$primary: #816797;
+$primary-light: findLightColor($primary);
+$primary-dark: findDarkColor($primary);
+$primary-invert: findColorInvert($primary);
+$background: #111;
+
+// Lists and maps
+$custom-colors: null !default;
+$custom-shades: null !default;
+
+// Setup $colors to use as bulma classes (e.g. 'is-twitter')
+$colors: mergeColorMaps(
+    (
+        'dark': (
+            $dark,
+            $dark-invert,
+        ),
+        'primary': (
+            $primary,
+            $primary-invert,
+            $primary-light,
+            $primary-dark,
+        ),
+    ),
+    $custom-colors
+);
+
+@import '~bulma';
+@import '~buefy/src/scss/buefy';

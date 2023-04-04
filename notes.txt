@@ -1,0 +1,17 @@
+Dashboard Todo
+
+- Todo w/ Checkboxes
+- Export/Import blocks
+- Archive
+- Richt text editor for notes
+- Toggle for ordering
+- Clickable Links/Buttons? 
+- Bookmarks (list of links, automatically get favicons? toggle for showing name that you enter as well
+
+- draggable
+- image (drag drop to quickly insert image block)
+- notes, checklists, archive as extra buttonat top?
+- general archive for deleted blocks?
+- collapsible
+
+https://colorhunt.co/palette/1b243051557e816797d6d5a8

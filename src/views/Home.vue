@@ -1,101 +1,103 @@
 <template>
-    <header>
-        <div class="card">
-            <Button icon="pi pi-plus" @click="addBlock()" />
+    <div class="home flex flex-col">
+        <div class="flex mt-4 mx-4 p-5 rounded-md bg-slate-800">
+            <b-button
+                class="mr-5"
+                type="is-primary"
+                icon-right="plus"
+                size="is-medium"
+                @click="addBlock"
+            />
+            <b-button
+                class="mr-5"
+                type="is-primary"
+                icon-right="export-variant"
+                size="is-medium"
+                @click="exportDb"
+            />
+            <b-button
+                class="mr-5"
+                type="is-primary"
+                icon-right="import"
+                size="is-medium"
+                @click="importDb"
+            />
         </div>
-    </header>
 
-    <BlocksWrapper
-        v-if="data.blocks && data.blocks.length"
-        :blocks="data.blocks"
-        @edit-block="(e) => editBlock(e)"
-    />
-
-    <EditBlockModal
-        :modalOptions="modal"
-        :block="data.blockToEdit"
-        @save="(b) => saveBlock(b)"
-        @delete="(b) => deleteBlock(b)"
-    />
-    <Toast position="top-right" />
+        <BlocksWrapper :blocks="blocks" @update="loadBlocks()" />
+        <!-- <EditBlockModal v-model="showEditModal" @update="loadBlocks()" /> -->
+    </div>
 </template>
 
-<script setup>
-//my beatsaver profile https://api.beatsaver.com/maps/uploader/4284309/0
-import { ref, reactive, watch, nextTick, onMounted } from 'vue' //ref for primitives, reactive for objects
+<script>
 import { db } from '../lib/db'
-import { liveQuery, Dexie } from 'dexie'
+import { liveQuery } from 'dexie'
 import { useObservable } from '@vueuse/rxjs'
-import BlocksWrapper from '../components/BlocksWrapper.vue'
-import EditBlockModal from '../components/EditBlockModal.vue'
-import { allBlocks } from '../components/blocks'
+import EditBlockModal from '@/components/modals/EditBlockModal.vue'
+// import is needed for db functions
+import { importDB, exportDB, importInto, peakImportFile } from 'dexie-export-import'
 
-const data = reactive({
-    blocks: [],
-    blockToEdit: null,
-})
-
-const modal = reactive({ visible: false })
-
-const loadBlocks = async () => {
-    data.blocks = await db.blocks.toArray()
-}
-
-onMounted(() => {
-    loadBlocks()
-})
-
-// Edit Modal
-watch(
-    () => modal.visible,
-    (newval, oldval) => {
-        if (newval === false) {
-            data.blockToEdit = null
+export default {
+    name: 'Home',
+    data() {
+        return {
+            // cant use live query, it would loop the saves, can probably be throttled but this is fine for now. dont need livequeries
+            blocks: [],
         }
     },
-)
-const addBlock = () => {
-    modal.visible = true
-}
-const editBlock = (event) => {
-    data.blockToEdit = event
-    console.log(event)
-    console.log(data.blockToEdit)
-    nextTick(() => {
-        modal.visible = true
-    })
-}
-const saveBlock = async (block) => {
-    const lastBlock = data.blocks[data.blocks.length - 1]
-
-    block = Dexie.deepClone(block)
-    console.log(block)
-    if (!block.id) {
-        if (lastBlock) {
-            if (lastBlock.x < 8) {
-                block.x = lastBlock.x + 2
-                block.y = lastBlock.y
-            } else {
-                block.x = 0
-                block.y = lastBlock.y + 5
-            }
-        } else {
-            block.x = 0
-            block.y = 0
-        }
-        block.w = 2
-        block.h = 2
-        block.i = JSON.stringify(block)
-    }
-    db.blocks.put(block)
-    data.blockToEdit = null
-    modal.visible = false
-    loadBlocks()
-}
-const deleteBlock = (block) => {
-    db.blocks.delete(block.id)
-    modal.visible = false
-    loadBlocks()
+    mounted() {
+        this.loadBlocks()
+        // this.$toast.open({
+        //     duration: 5000,
+        //     message: `danger toast test, Something's not good, also I'm on <b>bottom</b>`,
+        //     position: 'is-bottom',
+        //     type: 'is-danger',
+        // })
+    },
+    methods: {
+        addBlock() {
+            this.$buefy.modal.open({
+                parent: this,
+                component: EditBlockModal,
+                hasModalCard: true,
+                trapFocus: true,
+                props: { test: true, test2: () => console.log('yay') },
+                events: {
+                    close: () => {
+                        console.log('close')
+                        this.loadBlocks()
+                    },
+                },
+            })
+        },
+        async loadBlocks() {
+            console.log('load blocks')
+            this.blocks = []
+            this.blocks = await db.blocks.toArray()
+            console.log(this.blocks)
+        },
+        async exportDb() {
+            let dbBlob = await db.export()
+            dbBlob = JSON.parse(await dbBlob.text())
+            this.$buefy.dialog.alert({
+                canCancel: true,
+                title: 'DB Blob',
+                message: dbBlob,
+                confirmText: 'yay',
+            })
+        },
+        importDb() {
+            this.$buefy.dialog.prompt({
+                message: `EVERYTHING WILL BE DELETED`,
+                message: `Enter db blob:`,
+                canCancel: true,
+                onConfirm: async (json) => {
+                    await db.import(new Blob([json]))
+                    this.loadBlocks()
+                },
+            })
+        },
+    },
+    watch: {},
 }
 </script>
-<style lang="scss"></style>

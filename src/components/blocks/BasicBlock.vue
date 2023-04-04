@@ -4,20 +4,25 @@
     </div>
 </template>
 
-<script setup>
-import { ref, reactive, defineAsyncComponent } from 'vue' //ref for primitives, reactive for objects
+<script>
+import { allBlocks, components } from '@/components/blocks'
 
-const props = defineProps({
-    block: Object,
-})
-
-const blockName = () => {
-    const code = props.block.block.code
-    return `${code}Block`
-}
-
-const getBlock = () => {
-    return defineAsyncComponent(() => import(`../blocks/${blockName()}.vue`))
+export default {
+    components: {
+        ...components,
+    },
+    props: {
+        block: {
+            required: true,
+            type: Object,
+        },
+    },
+    methods: {
+        getBlock() {
+            const blockCode = this.block?.type?.code
+            return `${blockCode}Block`
+        },
+    },
 }
 </script>
 
