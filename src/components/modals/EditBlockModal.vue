@@ -2,7 +2,7 @@
     <div class="editBlockModal modal-card" style="width: auto">
         <header class="modal-card-head">
             <p class="modal-card-title">
-                {{ block.id ? 'Edit Block' : 'Add new Block' }}
+                {{ block.id ? 'Edit Block' : 'Add new block' }}
             </p>
         </header>
         <section class="modal-card-body">
@@ -57,13 +57,12 @@
 <script>
 import { db } from '@/lib/db'
 import { allBlocks, getDefaultBlock, components } from '@/components/blocks'
-console.log(components)
 
 export default {
     components: {
         ...components,
     },
-    props: ['value', 'item'],
+    props: ['value', 'item', 'prefire'],
     data() {
         return {
             allBlocks: allBlocks,
@@ -74,8 +73,14 @@ export default {
     created() {
         // reset block
         this.deleteSure = false
-        if (this.item) this.block = this.item
-        console.log(components)
+        if (this.item) this.block = structuredClone(this.item)
+    },
+    mounted() {
+        if (this.prefire) {
+            console.log(allBlocks.find((item) => item.code == this.prefire))
+            this.block.type =
+                allBlocks.find((item) => item.code == this.prefire) || this.block.type
+        }
     },
     methods: {
         async saveBlock() {

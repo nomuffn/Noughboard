@@ -1,6 +1,6 @@
 <template>
     <div class="home flex flex-col">
-        <div class="flex mt-4 mx-4 p-5 rounded-md bg-slate-800">
+        <div class="flex mt-4 mx-4 p-5 rounded-md bg-slate-800 max-w-50 self-center">
             <b-button
                 class="mr-5"
                 type="is-primary"
@@ -45,7 +45,7 @@ export default {
             blocks: [],
         }
     },
-    mounted() {
+    async mounted() {
         this.loadBlocks()
         // this.$toast.open({
         //     duration: 5000,
@@ -53,15 +53,45 @@ export default {
         //     position: 'is-bottom',
         //     type: 'is-danger',
         // })
+
+        // hash redirects
+        if (this.$route.hash) {
+            window.location.href = this.$route.hash.replace('#', '?')
+        }
+        // twitch auth
+        if (this.$route.query?.access_token) {
+            // TODO move logic to lib/twitch.js
+            localStorage.setItem(
+                'twitchToken',
+                `Bearer ${this.$route.query.access_token}`,
+            )
+            const twitchUserData = await this.axios.get(
+                'https://api.twitch.tv/helix/users',
+                {
+                    headers: {
+                        Authorization: localStorage.getItem('twitchToken'),
+                        'Client-Id': 'vw28o8a3angs5e66bowr9zqqcji9dv',
+                    },
+                },
+            )
+            if (twitchUserData?.data?.data.length == 1) {
+                localStorage.setItem(
+                    'twitchUserData',
+                    JSON.stringify(twitchUserData.data.data[0]),
+                )
+            }
+            this.$router.replace('/')
+            this.addBlock('twitchFeed')
+        }
     },
     methods: {
-        addBlock() {
+        addBlock(prefire = null) {
             this.$buefy.modal.open({
                 parent: this,
                 component: EditBlockModal,
                 hasModalCard: true,
                 trapFocus: true,
-                props: { test: true, test2: () => console.log('yay') },
+                props: { prefire },
                 events: {
                     close: () => {
                         console.log('close')
@@ -78,11 +108,13 @@ export default {
         },
         async exportDb() {
             let dbBlob = await db.export()
-            dbBlob = JSON.parse(await dbBlob.text())
+            dbBlob = await dbBlob.text()
+            console.log(dbBlob)
+            navigator.clipboard.writeText(dbBlob)
             this.$buefy.dialog.alert({
                 canCancel: true,
                 title: 'DB Blob',
-                message: dbBlob,
+                message: 'copied to clipboard',
                 confirmText: 'yay',
             })
         },

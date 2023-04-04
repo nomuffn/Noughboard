@@ -1,18 +1,19 @@
 <template>
-    <div v-if="!edit" class="textBlock">
+    <div v-if="!edit" class="textBlock prose dark:prose-invert" style="margin-top: -20px">
         <div v-html="input.text" />
     </div>
     <div v-else>
         <b-field label="Content">
-            <b-input v-model="input.text" type="textarea"></b-input>
+            <VueEditor v-model="input.text" />
         </b-field>
     </div>
 </template>
 
 <script>
-// implement tiptap
+import { VueEditor } from 'vue2-editor'
 
 export default {
+    components: { VueEditor },
     mounted() {},
     props: {
         input: {

@@ -5,7 +5,7 @@
         :row-height="30"
         :is-draggable="true"
         :is-resizable="true"
-        :vertical-compact="true"
+        :vertical-compact="false"
         :margin="[10, 10]"
         :use-css-transforms="true"
         @layout-updated="layoutUpdatedEvent"

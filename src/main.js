@@ -3,6 +3,8 @@ import App from './App.vue'
 import './registerServiceWorker'
 import router from './router'
 import store from './store'
+import axios from 'axios'
+import VueAxios from 'vue-axios'
 
 import Buefy from 'buefy'
 import 'buefy/dist/buefy.css'
@@ -24,5 +26,6 @@ new Vue({
 }).$mount('#app')
 
 Vue.use(Buefy)
+Vue.use(VueAxios, axios)
 
 Vue.prototype.$toast = ToastProgrammatic

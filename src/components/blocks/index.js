@@ -25,6 +25,10 @@ const allBlocks = [
         name: 'Reminder',
         code: 'reminder',
     },
+    {
+        name: 'Timer',
+        code: 'timer',
+    },
 ]
 
 let components = {}
