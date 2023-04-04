@@ -1,7 +1,7 @@
 <template>
     <div v-if="!edit" class="tasksBlock">
         <div class="flex justify-between items-center">
-            <p>{{ input.category }}</p>
+            <strong>{{ input.category }}</strong>
             <div class="actions flex">
                 <b-button icon-right="archive" type="is-text" @click="openArchive()" />
                 <b-button icon-right="plus" type="is-text" @click="newTask()" />
@@ -38,7 +38,7 @@ export default {
         },
     },
     mounted() {
-        this.loadTasks()
+        if (!this.edit) this.loadTasks()
     },
     methods: {
         async loadTasks() {

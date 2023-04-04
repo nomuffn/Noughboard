@@ -4,15 +4,15 @@
             <p class="modal-card-title">New Task for '{{ category }}'</p>
         </header>
         <section class="modal-card-body">
-            <b-field label="Priority">
-                <b-numberinput v-model="task.priority" :min="1" :max="5"></b-numberinput>
-            </b-field>
-
             <b-field label="Task">
                 <b-input v-model="task.content"></b-input>
             </b-field>
             <b-field label="Details">
                 <b-input v-model="task.details" type="textarea"></b-input>
+            </b-field>
+
+            <b-field label="Priority">
+                <b-numberinput v-model="task.priority"></b-numberinput>
             </b-field>
         </section>
         <footer class="modal-card-foot">
