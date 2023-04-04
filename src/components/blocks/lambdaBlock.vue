@@ -1,7 +1,7 @@
 <template>
     <div class="lambdaBlock">
         <div class="view" v-if="!edit">
-            <ProgressSpinner v-if="loading" style="height: 3rem" />
+            <b-loading v-if="loading" v-model="loading" />
             <div class="result" v-else-if="Object.keys(result).length">
                 <p class="remaining" v-if="input.repeat > 0">~{{ getRemainingTime() }}</p>
                 <div v-for="item in result" :key="item.type + item.value">
@@ -20,20 +20,12 @@
             <label for="minmax-buttons"
                 >(Optional) Run every x minutes after the initial render</label
             >
-            <InputNumber
-                id="minmax-buttons"
-                v-model="input.repeat"
-                mode="decimal"
-                showButtons
-                :min="0"
-                :max="100"
-            />
+            <b-numberinput v-model="input.repeat" id="minmax-buttons" min="0" ax="100" />
 
             <ScriptEditor v-model="input.lambda" />
-            <Button
+            <b-button
                 label="Test run code"
-                icon="pi pi-check"
-                class="p-button-outlined"
+                icon-right="check"
                 @click="checkCode()"
                 :disabled="!input.lambda || !input.lambda.length"
             />
@@ -41,146 +33,97 @@
     </div>
 </template>
 
-<script setup>
-import {
-    computed,
-    onMounted,
-    reactive,
-    ref,
-    watch,
-    onBeforeMount,
-} from '@vue/runtime-core'
-import ScriptEditor from '../ScriptEditor.vue'
-import { useToast } from 'primevue/usetoast'
-import axios from 'axios'
+<script>
+import ScriptEditor from '@/components/ScriptEditor.vue'
 import { Lambda, defaultLambda } from '@/lib/lambda'
 
-const props = defineProps({
-    edit: Boolean,
-    input: Object,
-})
-const toast = useToast()
-
-const loading = ref(true)
-const result = reactive({})
-const remainingTime = ref(0)
-const getRemainingTime = () => {
-    const seconds = 60 * props.input.repeat - remainingTime.value
-    const remaining = Math.round(seconds / 60, 0)
-    if (remaining <= 1) return `${seconds} s`
-    return `${remaining} m`
-}
-
-const runCode = async () => {
-    if (!props.edit) {
-        loading.value = true
-        try {
-            const res = await new Lambda(props.input.lambda).run()
-            Object.assign(result, res)
-            console.log(res)
-        } catch (e) {
-            console.log(e)
-        } finally {
-            loading.value = false
+export default {
+    components: {
+        ScriptEditor,
+    },
+    props: {
+        edit: {
+            type: Boolean,
+        },
+        input: {
+            type: Object,
+            required: true,
+        },
+    },
+    data() {
+        return {
+            loading: false,
+            result: null,
+            remainingTime: 0,
         }
-    }
-}
+    },
+    async mounted() {
+        if (!this.input.lambda) this.input.lambda = defaultLambda
 
-onBeforeMount(() => {})
-onMounted(async () => {
-    if (!props.input.lambda) props.input.lambda = defaultLambda
+        if (!this.edit) {
+            await runCode()
 
-    if (!props.edit) {
-        await runCode()
-
-        const interval = props.input.repeat
-        if (!isNaN(interval) && interval > 0) {
-            setInterval(function () {
-                remainingTime.value = 0
-                runCode()
-            }, interval * 1000 * 60)
-            setInterval(function () {
-                remainingTime.value += 1
-            }, 1000)
-        }
-    }
-})
-
-// watch(
-//     () => props.input.lambda,
-//     () => {
-//         runCode()
-//     },
-// )
-
-const checkCode = async () => {
-    try {
-        let result = await new Lambda(props.input.lambda).run()
-        let resultJson = JSON.stringify(result)
-        let toastMessage = '...too long, check console logs 🤓'
-        if (resultJson.length <= 500) {
-            toastMessage = resultJson
-        }
-        toast.add({
-            severity: 'info',
-            summary: 'Result is:',
-            detail: toastMessage,
-            life: 5000,
-        })
-        console.log(result)
-    } catch (e) {
-        toast.add({
-            severity: 'error',
-            summary: 'Error in code',
-            detail: e,
-        })
-        console.log(e)
-    }
-}
-
-//exec lambda if not edit
-</script>
-
-<style lang="scss">
-.lambdaBlock {
-    .view {
-        .result {
-            div p {
-                min-height: 1rem;
+            const interval = this.input.repeat
+            if (!isNaN(interval) && interval > 0) {
+                setInterval(function () {
+                    remainingTime.value = 0
+                    runCode()
+                }, interval * 1000 * 60)
+                setInterval(function () {
+                    remainingTime.value += 1
+                }, 1000)
             }
         }
-        .remaining {
-            opacity: 0.5;
-            font-size: 70%;
-            position: absolute;
-            top: -15px;
-            right: -14px;
-        }
-    }
-    .edit {
-        display: flex;
-        flex-direction: column;
-        max-width: 800px;
-        width: 100%;
-        padding-left: 15px;
-
-        > * {
-            margin-bottom: 15px;
-        }
-
-        .scripteditor {
-            margin-bottom: 20px;
-            margin-left: -15px;
-        }
-        button {
-            align-self: flex-end;
-        }
-        label {
-            margin-bottom: 5px;
-        }
-        .p-inputnumber input {
-            max-width: 100px;
-        }
-    }
+    },
+    computed: {
+        remainingTime() {
+            const seconds = 60 * props.input.repeat - remainingTime.value
+            const remaining = Math.round(seconds / 60, 0)
+            if (remaining <= 1) return `${seconds} s`
+            return `${remaining} m`
+        },
+    },
+    methods: {
+        async runCode() {
+            if (!props.edit) {
+                loading.value = true
+                try {
+                    const res = await new Lambda(props.input.lambda).run()
+                    Object.assign(result, res)
+                    console.log(res)
+                } catch (e) {
+                    console.log(e)
+                } finally {
+                    loading.value = false
+                }
+            }
+        },
+        async checkCode() {
+            try {
+                let result = await new Lambda(props.input.lambda).run()
+                let resultJson = JSON.stringify(result)
+                let toastMessage = '...too long, check console logs 🤓'
+                if (resultJson.length <= 500) {
+                    toastMessage = resultJson
+                }
+                toast.add({
+                    severity: 'info',
+                    summary: 'Result is:',
+                    detail: toastMessage,
+                    life: 5000,
+                })
+                console.log(result)
+            } catch (e) {
+                toast.add({
+                    severity: 'error',
+                    summary: 'Error in code',
+                    detail: e,
+                })
+                console.log(e)
+            }
+        },
+    },
 }
-</style>
+</script>
+
+<style lang="scss" scoped></style>

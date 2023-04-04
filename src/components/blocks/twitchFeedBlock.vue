@@ -27,11 +27,4 @@ export default {
 }
 </script>
 
-<style lang="scss">
-.textBlock {
-    p {
-        white-space: pre-line;
-        min-height: 1.5rem;
-    }
-}
-</style>
+<style lang="scss"></style>
