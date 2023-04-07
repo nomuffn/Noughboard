@@ -1,22 +1,22 @@
 <template>
     <div class="home flex flex-col">
-        <div class="flex mt-4 mx-4 p-5 rounded-md bg-slate-800 max-w-50 self-center">
+        <div class="flex mt-4 mx-4 p-3 rounded-md bg-slate-800 max-w-50 self-center">
             <b-button
-                class="mr-5"
+                class="m-3"
                 type="is-primary"
                 icon-right="plus"
                 size="is-medium"
                 @click="addBlock"
             />
             <b-button
-                class="mr-5"
+                class="m-3"
                 type="is-primary"
                 icon-right="export-variant"
                 size="is-medium"
                 @click="exportDb"
             />
             <b-button
-                class="mr-5"
+                class="m-3"
                 type="is-primary"
                 icon-right="import"
                 size="is-medium"

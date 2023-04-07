@@ -2,7 +2,7 @@
     <div v-if="!edit" class="textBlock prose dark:prose-invert" style="margin-top: -20px">
         <div v-html="input.text" />
     </div>
-    <div v-else>
+    <div v-else class="textBlock">
         <b-field label="Content">
             <VueEditor v-model="input.text" />
         </b-field>
@@ -33,6 +33,16 @@ export default {
     p {
         white-space: pre-line;
         min-height: 1.5rem;
+    }
+
+    .quillWrapper {
+        button svg {
+            filter: invert(1);
+        }
+
+        .ql-picker-label {
+            color: #fff;
+        }
     }
 }
 </style>
