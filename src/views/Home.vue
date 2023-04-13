@@ -36,6 +36,7 @@ import { useObservable } from '@vueuse/rxjs'
 import EditBlockModal from '@/components/modals/EditBlockModal.vue'
 // import is needed for db functions
 import { importDB, exportDB, importInto, peakImportFile } from 'dexie-export-import'
+import twitch from '@/lib/twitch'
 
 export default {
     name: 'Home',
@@ -58,31 +59,8 @@ export default {
         if (this.$route.hash) {
             window.location.href = this.$route.hash.replace('#', '?')
         }
-        // twitch auth
-        if (this.$route.query?.access_token) {
-            // TODO move logic to lib/twitch.js
-            localStorage.setItem(
-                'twitchToken',
-                `Bearer ${this.$route.query.access_token}`,
-            )
-            const twitchUserData = await this.axios.get(
-                'https://api.twitch.tv/helix/users',
-                {
-                    headers: {
-                        Authorization: localStorage.getItem('twitchToken'),
-                        'Client-Id': 'vw28o8a3angs5e66bowr9zqqcji9dv',
-                    },
-                },
-            )
-            if (twitchUserData?.data?.data.length == 1) {
-                localStorage.setItem(
-                    'twitchUserData',
-                    JSON.stringify(twitchUserData.data.data[0]),
-                )
-            }
-            this.$router.replace('/')
-            this.addBlock('twitchFeed')
-        }
+
+        twitch.handleToken()
     },
     methods: {
         addBlock(prefire = null) {
@@ -101,7 +79,6 @@ export default {
             })
         },
         async loadBlocks() {
-            console.log('load blocks')
             this.blocks = []
             this.blocks = await db.blocks.toArray()
             console.log(this.blocks)

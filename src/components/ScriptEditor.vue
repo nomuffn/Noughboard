@@ -1,6 +1,6 @@
 <template>
     <prism-editor
-        v-bind="$attrs"
+        v-model="inputVal"
         class="scripteditor"
         :highlight="highlighter"
         line-numbers
@@ -19,12 +19,28 @@ import 'prismjs/components/prism-javascript'
 import 'prismjs/themes/prism-tomorrow.css' // import syntax highlighting styles
 
 export default {
+    data() {
+        return {
+            code: '',
+        }
+    },
     components: {
         PrismEditor,
     },
     methods: {
         highlighter(code) {
             return highlight(code, languages.js) // languages.<insert language> to return html with markup
+        },
+    },
+    props: ['value'],
+    computed: {
+        inputVal: {
+            get() {
+                return this.value
+            },
+            set(val) {
+                this.$emit('input', val)
+            },
         },
     },
 }
@@ -35,6 +51,21 @@ export default {
     background-color: #212121 !important;
     &:focus {
         outline: none;
+    }
+}
+.scripteditor {
+    .number {
+        min-width: inherit;
+        padding: inherit;
+        margin: 0;
+        vertical-align: inherit;
+        text-align: inherit;
+        justify-content: inherit;
+        height: inherit;
+        font-size: inherit;
+        border-radius: inherit;
+        background-color: inherit;
+        align-items: inherit;
     }
 }
 </style>

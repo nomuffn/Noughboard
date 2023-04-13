@@ -17,7 +17,7 @@ import '@/components/index.js'
 
 Vue.config.productionTip = false
 
-new Vue({
+const main = new Vue({
     router,
     store,
     render: function (h) {
@@ -29,3 +29,5 @@ Vue.use(Buefy)
 Vue.use(VueAxios, axios)
 
 Vue.prototype.$toast = ToastProgrammatic
+
+export default main

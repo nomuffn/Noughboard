@@ -49,7 +49,7 @@ export default {
     },
     created() {
         if (!localStorage.getItem('colNum')) {
-            localStorage.setItem('colNum', 20)
+            localStorage.setItem('colNum', 18)
         }
 
         this.colNum = parseInt(localStorage.getItem('colNum'))
@@ -61,7 +61,6 @@ export default {
     },
     methods: {
         layoutUpdatedEvent() {
-            console.log('save')
             db.blocks.bulkPut(this.blocks)
         },
         editBlock(item) {

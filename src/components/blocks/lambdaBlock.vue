@@ -2,8 +2,8 @@
     <div class="lambdaBlock">
         <div class="view" v-if="!edit">
             <b-loading v-if="loading" v-model="loading" />
-            <div class="result" v-else-if="Object.keys(result).length">
-                <p class="remaining" v-if="input.repeat > 0">~{{ getRemainingTime() }}</p>
+            <div class="result" v-else-if="result">
+                <p class="remaining" v-if="input.repeat > 0">~{{ getRemainingTime }}</p>
                 <div v-for="item in result" :key="item.type + item.value">
                     <!-- move all of this to an extra lambda wrapper/render component? -->
                     <template v-if="item.type == 'text'">
@@ -57,60 +57,80 @@ export default {
             remainingTime: 0,
         }
     },
+
     async mounted() {
-        if (!this.input.lambda) this.input.lambda = defaultLambda
-
         if (!this.edit) {
-            await runCode()
+            await this.runCode()
 
-            const interval = this.input.repeat
-            if (!isNaN(interval) && interval > 0) {
-                setInterval(function () {
-                    remainingTime.value = 0
-                    runCode()
-                }, interval * 1000 * 60)
-                setInterval(function () {
-                    remainingTime.value += 1
-                }, 1000)
-            }
+            this.startIntervals()
+        } else {
+            if (!this.inputLambda) this.inputLambda = defaultLambda
         }
     },
+    updated() {
+        this.startIntervals()
+    },
     computed: {
-        remainingTime() {
-            const seconds = 60 * props.input.repeat - remainingTime.value
+        inputLambda: {
+            get() {
+                return this.input.lambda
+            },
+            set(val) {
+                this.input.lambda = val
+            },
+        },
+        getRemainingTime() {
+            const seconds = 60 * this.input.repeat - this.remainingTime
             const remaining = Math.round(seconds / 60, 0)
             if (remaining <= 1) return `${seconds} s`
             return `${remaining} m`
         },
     },
     methods: {
+        async startIntervals() {
+            // TODO find a way to properly clear old intervals. beforeUnmount doesnt work cause component is not correctly unmounted? Maybe store all intervals in a global object/window or vuex storage? This only works the way it does cause in Home i set this.blocks = [] so no components are reused. Question if thats better this way or if components should be reused. Furthermore the intervals wouldnt be cleared if the block was deleted
+            clearInterval(window.repeat)
+            clearInterval(window.counter)
+
+            const interval = this.input.repeat
+            if (!isNaN(interval) && interval > 0) {
+                // TODO combine both intervals to one that counts the seconds and just checks when it should run by dividing
+                window.repeat = setInterval(async () => {
+                    this.remainingTime = 0
+                    await this.runCode()
+                }, interval * 1000 * 60)
+                window.counter = setInterval(() => {
+                    this.remainingTime += 1
+                    console.log('remainingTime', this.remainingTime)
+                }, 1000)
+            }
+        },
         async runCode() {
-            if (!props.edit) {
-                loading.value = true
+            if (!this.edit) {
+                this.loading = true
                 try {
-                    const res = await new Lambda(props.input.lambda).run()
-                    Object.assign(result, res)
-                    console.log(res)
+                    const res = await new Lambda(this.input.lambda).run()
+                    this.result = res
                 } catch (e) {
                     console.log(e)
                 } finally {
-                    loading.value = false
+                    this.loading = false
                 }
             }
         },
         async checkCode() {
             try {
-                let result = await new Lambda(props.input.lambda).run()
+                let result = await new Lambda(this.input.lambda).run()
                 let resultJson = JSON.stringify(result)
                 let toastMessage = '...too long, check console logs 🤓'
                 if (resultJson.length <= 500) {
                     toastMessage = resultJson
                 }
-                toast.add({
-                    severity: 'info',
-                    summary: 'Result is:',
-                    detail: toastMessage,
-                    life: 5000,
+                this.$toast.open({
+                    duration: 5000,
+                    message: 'Result is: ' + toastMessage,
+                    position: 'is-bottom',
+                    type: 'is-success',
                 })
                 console.log(result)
             } catch (e) {
@@ -119,6 +139,7 @@ export default {
                     summary: 'Error in code',
                     detail: e,
                 })
+
                 console.log(e)
             }
         },

@@ -3,16 +3,40 @@
         <div class="flex justify-between items-center">
             <strong>{{ input.category }}</strong>
             <div class="actions flex">
+                <b-button
+                    v-if="input.daily"
+                    icon-right="history"
+                    type="is-text"
+                    @click="openHistory()"
+                />
                 <b-button icon-right="archive" type="is-text" @click="openArchive()" />
                 <b-button icon-right="plus" type="is-text" @click="newTask()" />
             </div>
         </div>
-        <TasksViewer class="my-2" :tasks="tasks" @update="loadTasks()" />
+        <TasksViewer
+            class="my-2"
+            :tasks="tasks"
+            @update="loadTasks()"
+            :daily="input.daily"
+        />
+        <p v-if="input.daily">Tasks reset in {{ dailyResetHoursLeft }}</p>
     </div>
     <div v-else>
         <b-field label="Category">
             <b-input v-model="input.category" type="textarea"></b-input>
         </b-field>
+        <b-field label="Daily Tasks">
+            <b-checkbox v-model="input.daily"> Active </b-checkbox>
+        </b-field>
+        <div v-if="input.daily">
+            <b-field label="Reset at">
+                <b-timepicker
+                    v-model="input.dailyResetTime"
+                    inline
+                    placeholder="Click to select..."
+                />
+            </b-field>
+        </div>
     </div>
 </template>
 
@@ -39,6 +63,16 @@ export default {
     },
     mounted() {
         if (!this.edit) this.loadTasks()
+    },
+    computed: {
+        dailyResetHoursLeft() {
+            // TODO interval to refresh numbers
+            const date = new Date(Date.parse(this.input.dailyResetTime))
+            const now = new Date()
+            const remHours = 23 - (date.getHours() + now.getHours())
+            const remMinutes = 59 - (date.getMinutes() + now.getMinutes())
+            return `${remHours}hrs ${remMinutes}m`
+        },
     },
     methods: {
         async loadTasks() {

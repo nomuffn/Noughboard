@@ -7,7 +7,7 @@
         </header>
         <section class="modal-card-body">
             <b-dropdown v-model="block.type" aria-role="list">
-                <template #trigger="{ active }">
+                <template #trigger="{ active }" class="shadow">
                     <b-button
                         :label="block.type.name"
                         type="is-primary"
@@ -85,6 +85,11 @@ export default {
     methods: {
         async saveBlock() {
             let block = this.block
+
+            // temporary variable to do an action before the block gets updated. Such as deleting running intervals from lambdas
+            // if (block.inputValues.beforeUpdate)
+            //     block.inputValues.beforeUpdate() && delete block.inputValues.beforeUpdate
+
             if (!block.id) {
                 const colNum = parseInt(localStorage.getItem('colNum'))
                 const length = await db.blocks.count()
@@ -97,11 +102,15 @@ export default {
                     i: length + 1,
                 }
             }
-            await db.blocks.put(block)
+            await db.blocks.put(block).then(async (id) => {
+                block.i = block.id
+                await db.blocks.put(block)
+            })
             this.$emit('close')
         },
         async deleteBlock() {
             if (!this.deleteSure) return (this.deleteSure = true)
+
             await db.blocks.delete(this.block.id)
             this.$emit('close')
         },

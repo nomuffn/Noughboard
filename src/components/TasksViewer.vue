@@ -7,7 +7,7 @@
             class="task flex justify-between items-center"
         >
             <div>
-                <b-checkbox :value="task.done" @input="toggleComplete(task)">
+                <b-checkbox :value="states[task.id]" @input="toggleComplete(task)">
                     <strong>[ {{ task.priority }} ]</strong>
                     {{ task.content }}
                 </b-checkbox>
@@ -58,6 +58,22 @@ export default {
             Object: Boolean,
             required: false,
         },
+        daily: {
+            Object: Boolean,
+            default: false,
+        },
+    },
+    data() {
+        return {
+            states: {},
+        }
+    },
+    async created() {
+        let states = []
+        for (const task of this.tasks) {
+            states[task.id] = await this.isDone(task)
+        }
+        this.states = states
     },
     methods: {
         async moveTaskUp(task, up = true) {
@@ -85,8 +101,40 @@ export default {
         },
         async toggleComplete(task) {
             console.log('completeTask')
-            await db.tasks.update(task.id, { done: !task.done })
-            // this.$emit('update')
+            if (this.daily) {
+                let date = new Date()
+                date.setHours(0, 0, 0, 0)
+
+                const state = { taskId: task.id, date: date }
+
+                const taskState = await db.tasksState.get(state)
+                if (taskState) {
+                    await db.tasksState.where(state).delete()
+                } else {
+                    await db.tasksState.add(state)
+                }
+            } else {
+                await db.tasks.update(task.id, { done: !task.done })
+                // this.$emit('update')
+            }
+            this.states[task.id] = !task.done
+        },
+        async isDone(task) {
+            if (this.daily) {
+                let date = new Date()
+                date.setHours(0, 0, 0, 0)
+
+                const state = { taskId: task.id, date: date }
+
+                const taskState = await db.tasksState.get(state)
+                if (taskState) {
+                    return true
+                } else {
+                    return false
+                }
+            } else {
+                return task.done
+            }
         },
     },
 }
