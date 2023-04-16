@@ -46,6 +46,11 @@ export default {
             required: true,
             type: Array,
         },
+        dashboardId: {
+            required: false,
+            type: Number,
+            default: 0,
+        },
     },
     created() {
         if (!localStorage.getItem('colNum')) {
@@ -69,7 +74,7 @@ export default {
                 component: EditBlockModal,
                 hasModalCard: true,
                 trapFocus: true,
-                props: { item },
+                props: { item, dashboardId: this.dashboardId },
                 events: {
                     close: () => {
                         this.$emit('update')

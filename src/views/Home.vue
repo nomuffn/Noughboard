@@ -1,5 +1,27 @@
 <template>
-    <div class="home flex flex-col">
+    <div v-if="dashboard" class="home flex flex-col">
+        <div class="flex self-center items-center">
+            <b-button
+                class="m-3"
+                type="is-text"
+                icon-right="arrow-left"
+                @click="loadDashboard(-1)"
+            />
+            <p>{{ dashboard.title }}</p>
+            <b-button type="is-text" icon-right="pencil" @click="editDashboard()" />
+            <b-button
+                class="m-3"
+                type="is-text"
+                icon-right="plus"
+                @click="editDashboard(true)"
+            />
+            <b-button
+                class="m-3"
+                type="is-text"
+                icon-right="arrow-right"
+                @click="loadDashboard(1)"
+            />
+        </div>
         <div class="flex mt-4 mx-4 p-3 rounded-md bg-slate-800 max-w-50 self-center">
             <b-button
                 class="m-3"
@@ -24,9 +46,14 @@
             />
         </div>
 
-        <BlocksWrapper :blocks="blocks" @update="loadBlocks()" />
+        <BlocksWrapper
+            :dashboardId="dashboard.id"
+            :blocks="blocks"
+            @update="loadBlocks()"
+        />
         <!-- <EditBlockModal v-model="showEditModal" @update="loadBlocks()" /> -->
     </div>
+    <div v-else>Something went wrong while loading a dashboard</div>
 </template>
 
 <script>
@@ -44,10 +71,11 @@ export default {
         return {
             // cant use live query, it would loop the saves, can probably be throttled but this is fine for now. dont need livequeries
             blocks: [],
+            dashboard: null,
         }
     },
     async mounted() {
-        this.loadBlocks()
+        await this.loadDashboard()
         // this.$toast.open({
         //     duration: 5000,
         //     message: `danger toast test, Something's not good, also I'm on <b>bottom</b>`,
@@ -63,13 +91,50 @@ export default {
         twitch.handleToken()
     },
     methods: {
+        async loadDashboard(indexAdd = 0) {
+            const dashboards = await db.dashboards.toArray()
+
+            if (!dashboards.length) {
+                await db.dashboards.add({ title: 'Home' })
+                return this.loadDashboard()
+            }
+
+            if (indexAdd == 0) {
+                this.dashboard = dashboards[0]
+            } else {
+                const index =
+                    indexAdd + dashboards.map((i) => i.id).indexOf(this.dashboard.id)
+                this.dashboard = dashboards[index]
+            }
+            this.loadBlocks()
+        },
+        async editDashboard(neww = false) {
+            this.$buefy.dialog.prompt({
+                message: `Dashboard title`,
+                inputAttrs: {
+                    value: neww ? '' : this.dashboard.title,
+                    maxlength: 15,
+                },
+                trapFocus: true,
+                onConfirm: async (title) => {
+                    if (neww) {
+                        await db.dashboards.add({ title })
+                        this.loadDashboard((await db.dashboards.count()) - 1)
+                    } else {
+                        await db.dashboards.put({ ...this.dashboard, title })
+                        this.dashboard = { ...this.dashboard, title }
+                        this.loadDashboard(0)
+                    }
+                },
+            })
+        },
         addBlock(prefire = null) {
             this.$buefy.modal.open({
                 parent: this,
                 component: EditBlockModal,
                 hasModalCard: true,
                 trapFocus: true,
-                props: { prefire },
+                props: { prefire, dashboardId: this.dashboard.id },
                 events: {
                     close: () => {
                         console.log('close')
@@ -79,8 +144,12 @@ export default {
             })
         },
         async loadBlocks() {
-            this.blocks = []
-            this.blocks = await db.blocks.toArray()
+            this.blocks = [] // dont reuse components
+            console.log(this.dashboard)
+            this.blocks = await db.blocks
+                .filter((block) => block.dashboard == this.dashboard.id)
+                .toArray()
+
             console.log(this.blocks)
         },
         async exportDb() {

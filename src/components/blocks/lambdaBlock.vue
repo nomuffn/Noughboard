@@ -7,7 +7,7 @@
                 <div v-for="item in result" :key="item.type + item.value">
                     <!-- move all of this to an extra lambda wrapper/render component? -->
                     <template v-if="item.type == 'text'">
-                        <p :style="item.style">{{ item.value }}</p>
+                        <p :style="item.style" v-html="item.value" />
                     </template>
                 </div>
             </div>
@@ -88,18 +88,19 @@ export default {
     },
     methods: {
         async startIntervals() {
-            // TODO find a way to properly clear old intervals. beforeUnmount doesnt work cause component is not correctly unmounted? Maybe store all intervals in a global object/window or vuex storage? This only works the way it does cause in Home i set this.blocks = [] so no components are reused. Question if thats better this way or if components should be reused. Furthermore the intervals wouldnt be cleared if the block was deleted
-            clearInterval(window.repeat)
-            clearInterval(window.counter)
+            // TODO find a way to properly clear old intervals. beforeUnmount doesnt work cause component is not correctly unmounted? Maybe store all intervals in a global object or vuex storage? This only works the way it does cause in Home i set this.blocks = [] so no components are reused. Question if thats better this way or if components should be reused. Furthermore the intervals wouldnt be cleared if the block was deleted
+            // keep in mind that it should work with multiple lambda blocks and each having their own intervals
+            // clearInterval(window.repeat)
+            // clearInterval(window.counter)
 
             const interval = this.input.repeat
             if (!isNaN(interval) && interval > 0) {
                 // TODO combine both intervals to one that counts the seconds and just checks when it should run by dividing
-                window.repeat = setInterval(async () => {
+                const repeat = setInterval(async () => {
                     this.remainingTime = 0
                     await this.runCode()
                 }, interval * 1000 * 60)
-                window.counter = setInterval(() => {
+                const counter = setInterval(() => {
                     this.remainingTime += 1
                     console.log('remainingTime', this.remainingTime)
                 }, 1000)
@@ -134,10 +135,9 @@ export default {
                 })
                 console.log(result)
             } catch (e) {
-                toast.add({
-                    severity: 'error',
-                    summary: 'Error in code',
-                    detail: e,
+                this.$toast.open({
+                    type: 'is-error',
+                    message: 'Error in code: ' + e,
                 })
 
                 console.log(e)

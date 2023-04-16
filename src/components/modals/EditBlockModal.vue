@@ -62,7 +62,7 @@ export default {
     components: {
         ...components,
     },
-    props: ['value', 'item', 'prefire'],
+    props: ['value', 'item', 'prefire', 'dashboardId'],
     data() {
         return {
             allBlocks: allBlocks,
@@ -81,6 +81,7 @@ export default {
             this.block.type =
                 allBlocks.find((item) => item.code == this.prefire) || this.block.type
         }
+        this.block.dashboard = this.dashboardId || 0 // id of dashboard, first one should always be 0, make sure its undeletable
     },
     methods: {
         async saveBlock() {
