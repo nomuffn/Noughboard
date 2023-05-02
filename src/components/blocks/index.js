@@ -14,8 +14,8 @@ const allBlocks = [
         code: 'twitchFeed',
     },
     {
-        name: 'Bookmarks',
-        code: 'bookmarks',
+        name: 'Bookmark',
+        code: 'bookmark',
     },
     {
         name: 'Lambda',
@@ -28,6 +28,10 @@ const allBlocks = [
     {
         name: 'Timer',
         code: 'timer',
+    },
+    {
+        name: 'Counter',
+        code: 'counter',
     },
 ]
 
