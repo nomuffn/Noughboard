@@ -1,14 +1,17 @@
 <template>
+    <!-- row height adjusted to a textblock with only one p element -->
     <grid-layout
         :layout.sync="blocks"
         :col-num="colNum"
-        :row-height="30"
+        :row-height="23"
         :is-draggable="true"
         :is-resizable="true"
-        :vertical-compact="false"
         :margin="[10, 10]"
         :use-css-transforms="true"
         @layout-updated="layoutUpdatedEvent"
+        :response="true"
+        :vertical-compact="true"
+        :is-mirrored="false"
     >
         <grid-item
             v-for="item in blocks"
@@ -18,6 +21,7 @@
             :h="item.h"
             :i="item.i"
             :key="item.i"
+            drag-ignore-from=".draggable"
         >
             <div
                 class="bg-slate-800 rounded-md h-full w-full p-4 overflow-auto"
@@ -30,10 +34,10 @@
 </template>
 
 <script>
-import VueGridLayout from 'vue-grid-layout'
 import { db } from '@/lib/db'
 import BasicBlock from '@/components/blocks/BasicBlock.vue'
 import EditBlockModal from '@/components/modals/EditBlockModal.vue'
+import VueGridLayout from 'vue-grid-layout'
 
 export default {
     components: {

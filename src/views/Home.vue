@@ -57,12 +57,11 @@
 </template>
 
 <script>
-import { db } from '../lib/db'
-import { liveQuery } from 'dexie'
-import { useObservable } from '@vueuse/rxjs'
 import EditBlockModal from '@/components/modals/EditBlockModal.vue'
-// import is needed for db functions
+import { db } from '../lib/db'
+// import is needed for db functions: import {importDB, exportDB, importInto, peakImportFile} from "dexie-export-import";
 import { importDB, exportDB, importInto, peakImportFile } from 'dexie-export-import'
+
 import twitch from '@/lib/twitch'
 
 export default {
@@ -170,6 +169,9 @@ export default {
                 message: `Enter db blob:`,
                 canCancel: true,
                 onConfirm: async (json) => {
+                    await db.tables.forEach(async (table) => {
+                        await table.clear()
+                    })
                     await db.import(new Blob([json]))
                     this.loadBlocks()
                 },

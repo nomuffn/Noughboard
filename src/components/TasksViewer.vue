@@ -1,54 +1,59 @@
 <template>
     <div class="tasks flex flex-col">
-        <div
-            v-for="task in tasks"
-            :key="task.id"
-            :task="task"
-            class="task flex justify-between items-center"
+        <draggable
+            class="draggable"
+            v-model="mutableTasks"
+            @change="updateTasks"
+            animation="200"
         >
-            <div>
-                <b-checkbox :value="states[task.id]" @input="toggleComplete(task)">
-                    <strong>[ {{ task.priority }} ]</strong>
-                    {{ task.content }}
-                </b-checkbox>
-                <p
-                    v-if="task.details"
-                    style="
-                        margin-left: 30px;
-                        font-size: 80%;
-                        margin-top: -3px;
-                        overflow-wrap: anywhere;
-                    "
+            <transition-group>
+                <div
+                    v-for="task in mutableTasks"
+                    :key="task.id"
+                    class="flex justify-between items-center"
                 >
-                    {{ task.details }}
-                </p>
-            </div>
+                    <div>
+                        <b-checkbox
+                            :value="states[task.id]"
+                            @input="toggleComplete(task)"
+                        >
+                            {{ task.content }}
+                        </b-checkbox>
+                        <p
+                            v-if="task.details"
+                            style="
+                                margin-left: 30px;
+                                font-size: 80%;
+                                margin-top: -3px;
+                                overflow-wrap: anywhere;
+                            "
+                        >
+                            {{ task.details }}
+                        </p>
+                    </div>
 
-            <div class="actions flex">
-                <b-button
-                    v-if="!archive"
-                    type="is-text"
-                    icon-right="arrow-down-bold"
-                    @click="moveTaskUp(task, false)"
-                />
-                <b-button
-                    v-if="!archive"
-                    type="is-text"
-                    icon-right="arrow-up-bold"
-                    @click="moveTaskUp(task)"
-                />
-
-                <b-button type="is-text" icon-right="pencil" @click="editTask(task)" />
-            </div>
-        </div>
+                    <div class="actions flex">
+                        <b-button
+                            type="is-text"
+                            icon-right="pencil"
+                            @click="editTask(task)"
+                        />
+                    </div>
+                </div>
+            </transition-group>
+        </draggable>
     </div>
 </template>
 
 <script>
-import { db } from '@/lib/db'
 import EditTaskModal from '@/components/modals/EditTaskModal.vue'
+import { db } from '@/lib/db'
+import draggable from 'vuedraggable'
 
 export default {
+    components: {
+        draggable,
+    },
     props: {
         tasks: {
             Object: Array,
@@ -66,6 +71,7 @@ export default {
     data() {
         return {
             states: {},
+            mutableTasks: this.tasks,
         }
     },
     async created() {
@@ -75,14 +81,23 @@ export default {
         }
         this.states = states
     },
+    watch: {
+        tasks(newval, oldval) {
+            this.mutableTasks = newval
+        },
+    },
     methods: {
-        async moveTaskUp(task, up = true) {
-            if (up) {
-                task.priority++
-            } else {
-                task.priority--
-            }
-            await db.tasks.put(task)
+        async updateTasks() {
+            // await db.tasks.put({ ...item.moved.element, index: item.moved.newIndex })
+            await db.tasks.bulkPut(
+                this.mutableTasks.map((item, index) => {
+                    return {
+                        ...item,
+                        index,
+                    }
+                }),
+            )
+            console.log('update')
             this.$emit('update')
         },
         editTask(task) {
@@ -114,7 +129,7 @@ export default {
                     await db.tasksState.add(state)
                 }
             } else {
-                await db.tasks.update(task.id, { done: !task.done })
+                await db.tasks.update(task.id, { done: !this.states[task.id] })
                 // this.$emit('update')
             }
             this.states[task.id] = !task.done

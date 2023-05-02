@@ -84,8 +84,7 @@ export default {
                         this.input.category.toLowerCase() ==
                             task.category.toLowerCase() && !task.done,
                 )
-                .reverse()
-                .sortBy('priority')
+                .sortBy('index')
         },
 
         newTask() {

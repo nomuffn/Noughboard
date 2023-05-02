@@ -21,6 +21,14 @@ db.version(3).stores({
     tasksState: '[taskId+date]',
 })
 
+db.version(4).stores({
+    blocks: '++id',
+    dashboards: '++id',
+    tasks: '++id',
+    tasksState: '[taskId+date]',
+    states: '[type+id+date]',
+})
+
 export function getBlock(index) {
     return db.blocks.toArray()
 }

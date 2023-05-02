@@ -1,5 +1,8 @@
 <template>
-    <div v-if="!edit" class="textBlock prose dark:prose-invert" style="margin-top: -20px">
+    <div
+        v-if="!edit"
+        class="textBlock prose dark:prose-invert prose-p:mt-0 prose-p:mb-0 prose-ul:m-0 prose-li:m-0"
+    >
         <div v-html="input.text" />
     </div>
     <div v-else class="textBlock">
