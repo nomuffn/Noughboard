@@ -14,24 +14,28 @@ const allBlocks = [
         code: 'twitchFeed',
     },
     {
-        name: 'Bookmark',
-        code: 'bookmark',
+        name: 'Counter',
+        code: 'counter',
     },
     {
-        name: 'Lambda',
+        name: 'Lambda (kidna WIP)',
         code: 'lambda',
     },
     {
-        name: 'Reminder',
+        name: 'Bookmark (WIP)',
+        code: 'bookmark',
+    },
+    {
+        name: 'Picture (WIP)',
+        code: 'picture',
+    },
+    {
+        name: 'Reminder (WIP)',
         code: 'reminder',
     },
     {
-        name: 'Timer',
+        name: 'Timer (WIP)',
         code: 'timer',
-    },
-    {
-        name: 'Counter',
-        code: 'counter',
     },
 ]
 

@@ -1,7 +1,7 @@
 <template>
     <div v-if="!edit" class="counterBlock">
-        <div class="flex flex-row justify-between">
-            <div>
+        <div class="flex flex-row justify-between flex-wrap items-center">
+            <div class="mb-1">
                 <p class="font-bold">
                     {{ input.title }}
                 </p>
@@ -9,16 +9,22 @@
             </div>
             <div>
                 <b-button
-                    class="m-2"
+                    class="mx-1"
                     type="is-primary"
                     icon-right="plus"
                     @click="add()"
                 />
                 <b-button
-                    class="m-2"
+                    class="mx-1"
                     type="is-primary"
                     icon-right="minus"
                     @click="add(-1)"
+                />
+                <b-button
+                    class="mx-1"
+                    type="is-primary"
+                    icon-right="history"
+                    @click="history"
                 />
             </div>
         </div>
@@ -28,7 +34,7 @@
             <b-input v-model="input.title"></b-input>
             <!-- <b-input v-model="input.description" type="textarea"></b-input> -->
         </b-field>
-        <b-field label="Key">
+        <b-field label="identifier">
             <b-input v-model="input.key"></b-input>
             <!-- <b-input v-model="input.description" type="textarea"></b-input> -->
         </b-field>
@@ -38,6 +44,7 @@
 <script>
 import { db } from '@/lib/db'
 import slugify from 'slugify'
+import CounterHistoryModal from '@/components/modals/CounterHistoryModal.vue'
 
 export default {
     mounted() {
@@ -61,13 +68,11 @@ export default {
     methods: {
         getObject(withCount = true) {
             // only do without Count if you need to get the state
-            let date = new Date()
-            date.setHours(0, 0, 0, 0)
             const count = withCount ? { count: this.count } : null
             return {
                 type: 'counter',
                 id: slugify(this.input.key),
-                date: date,
+                date: new Date().toLocaleDateString(),
                 ...count, // lohl
             }
         },
@@ -90,6 +95,15 @@ export default {
             console.log(this.getObject())
             await db.states.put(this.getObject())
             this.load()
+        },
+        history() {
+            this.$buefy.modal.open({
+                parent: this,
+                component: CounterHistoryModal,
+                hasModalCard: true,
+                trapFocus: true,
+                props: { type: 'counter', id: slugify(this.input.key) },
+            })
         },
     },
 }
