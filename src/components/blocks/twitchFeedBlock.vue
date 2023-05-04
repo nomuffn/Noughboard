@@ -38,12 +38,12 @@
         </div>
     </div>
     <div v-else>
-        <b-field label="Content">
-            <b-input v-model="input.streamers" type="textarea"></b-input>
-        </b-field>
         <div v-if="!twitchAuthenticated">
             <b-button @click="loginTwitch">Login to twitch</b-button>
         </div>
+        <b-field class="mt-2" label="Add streamer by pressing enter">
+            <ListInput v-model="input.streamers" />
+        </b-field>
     </div>
 </template>
 
@@ -69,11 +69,15 @@ export default {
         }
     },
     async mounted() {
+        if (!this.input.streamers) {
+            this.input.streamers = []
+        }
+
         // TODO move logic to lib/twitch.js
         this.twitchAuthenticated = twitch.isAuthenticated()
 
         if (!this.edit) {
-            this.streamers = await twitch.getStreamers(this.input.streamers.split(','))
+            this.streamers = await twitch.getStreamers(this.input.streamers)
         }
     },
     methods: {

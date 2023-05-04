@@ -10,7 +10,7 @@
                 <div
                     v-for="task in mutableTasks"
                     :key="task.id"
-                    class="flex justify-between items-center"
+                    class="flex justify-between items-center mb-1"
                 >
                     <div>
                         <b-checkbox
