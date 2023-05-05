@@ -25,7 +25,7 @@
             @update="loadTasks()"
             :dailyResetTime="input.daily ? input.dailyResetTime : null"
         />
-        <p v-if="input.daily">Tasks reset in {{ dailyResetTimeLeft }}</p>
+        <p v-if="input.daily">Resets in {{ dailyResetTimeLeft }}</p>
     </div>
     <div v-else>
         <b-field label="Category">

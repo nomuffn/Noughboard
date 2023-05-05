@@ -11,9 +11,9 @@
                 <b-input v-model="task.details" type="textarea"></b-input>
             </b-field>
 
-            <b-field label="Priority">
+            <!-- <b-field label="Priority">
                 <b-numberinput v-model="task.priority"></b-numberinput>
-            </b-field>
+            </b-field> -->
         </section>
         <footer class="modal-card-foot">
             <b-button label="Close" @click="$emit('close')" />
@@ -41,7 +41,7 @@ export default {
     data() {
         return {
             task: {
-                priority: 5,
+                // priority: 5,
                 content: '',
                 details: '',
             },

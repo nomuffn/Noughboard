@@ -2,7 +2,7 @@
     <div class="editBlockModal modal-card" style="width: auto">
         <header class="modal-card-head">
             <p class="modal-card-title">
-                {{ block.id ? 'Edit Block' : 'Add new block' }}
+                {{ block.id ? `Edit Block` : 'Add new block' }}
             </p>
         </header>
         <section class="modal-card-body">
