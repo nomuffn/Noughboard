@@ -67,6 +67,9 @@ export default {
             default: false,
         },
     },
+    timers: {
+        log: { time: 1000, autostart: true },
+    },
     mounted() {
         if (!this.edit) this.loadTasks()
     },
@@ -81,6 +84,9 @@ export default {
         },
     },
     methods: {
+        log() {
+            console.log('Hello world')
+        },
         async loadTasks() {
             // always compare & save category in lowercase
             // TODO implement created_at & updated_at

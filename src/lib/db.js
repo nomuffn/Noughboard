@@ -29,6 +29,13 @@ db.version(4).stores({
     states: '[type+id+date]',
 })
 
+db.version(5).stores({
+    blocks: '++id',
+    dashboards: '++id',
+    tasks: '++id',
+    states: '[type+id+date]',
+})
+
 export function getBlock(index) {
     return db.blocks.toArray()
 }

@@ -77,7 +77,6 @@ export default {
     },
     mounted() {
         if (this.prefire) {
-            console.log(allBlocks.find((item) => item.code == this.prefire))
             this.block.type =
                 allBlocks.find((item) => item.code == this.prefire) || this.block.type
         }
@@ -127,7 +126,6 @@ export default {
     computed: {
         blockComponent() {
             const blockCode = this.block?.type?.code
-            console.log({ blockCode })
             return `${blockCode}Block`
         },
         submitDisabled() {

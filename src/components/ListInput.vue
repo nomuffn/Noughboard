@@ -28,9 +28,7 @@ export default {
             input: null,
         }
     },
-    mounted() {
-        console.log(this.value)
-    },
+    mounted() {},
     methods: {
         add() {
             this.$emit('input', [...this.value, this.input])

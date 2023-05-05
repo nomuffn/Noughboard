@@ -63,18 +63,15 @@ twitch.getStreamers = async (streamersArray) => {
             },
         )
 
-        console.log(streamersArray)
         // filter by given streamers, lowercased
         let streamers = followedStreamers.data.data.filter((streamer) => {
             return streamersArray.find(
                 (string) => string.toLowerCase() == streamer.user_name.toLowerCase(),
             )
         })
-        console.log(streamers)
 
         // extract ids
         const streamerIds = streamers.map((item) => item.user_id)
-        console.log(streamerIds)
 
         if (streamerIds.length > 0) {
             // get data for ids
@@ -87,7 +84,6 @@ twitch.getStreamers = async (streamersArray) => {
                     },
                 },
             )
-            console.log(streamersInfo.data.data)
             return streamers.map((streamer) => {
                 return {
                     ...streamer,

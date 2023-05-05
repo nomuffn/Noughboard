@@ -140,7 +140,6 @@ export default {
                 props: { prefire, dashboardId: this.dashboard.id },
                 events: {
                     close: () => {
-                        console.log('close')
                         this.loadBlocks()
                     },
                 },
@@ -148,12 +147,9 @@ export default {
         },
         async loadBlocks() {
             this.blocks = [] // dont reuse components
-            console.log(this.dashboard)
             this.blocks = await db.blocks
                 .filter((block) => block.dashboard == this.dashboard.id)
                 .toArray()
-
-            console.log(this.blocks)
         },
         async exportDb() {
             let dbBlob = await db.export()

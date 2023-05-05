@@ -76,13 +76,10 @@ export default {
     },
     async mounted() {
         let states = []
-        console.log([...this.tasks])
         for (const task of this.tasks) {
-            console.log(task)
             states[task.id] = await this.isDone(task)
         }
         this.states = states
-        console.log(this.states)
     },
     watch: {
         tasks(newval, oldval) {
@@ -100,7 +97,6 @@ export default {
                     }
                 }),
             )
-            console.log('update')
             this.$emit('update')
         },
         editTask(task) {
@@ -118,7 +114,6 @@ export default {
             })
         },
         async toggleComplete(task) {
-            console.log('completeTask')
             if (this.daily) {
                 const state = {
                     type: 'dailytask',

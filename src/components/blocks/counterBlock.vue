@@ -81,18 +81,9 @@ export default {
             if (counterState && !isNaN(counterState.count)) {
                 this.count = counterState.count
             }
-
-            // const taskState = await db.tasksState.get(state)
-            //     if (taskState) {
-            //         await db.tasksState.where(state).delete()
-            //     } else {
-            //         await db.tasksState.add(state)
-            //     }
-            //     await db.tasks.update(task.id, { done: !task.done })
         },
         async add(add = 1) {
             this.count += add
-            console.log(this.getObject())
             await db.states.put(this.getObject())
             this.load()
         },
