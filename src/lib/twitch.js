@@ -12,7 +12,7 @@ twitch.isAuthenticated = () => {
 }
 
 twitch.login = () => {
-    window.location.href = `https://id.twitch.tv/oauth2/authorize?client_id=vw28o8a3angs5e66bowr9zqqcji9dv&redirect_uri=${location.origin}&response_type=token&scope=user:read:follows`
+    window.location.href = `https://id.twitch.tv/oauth2/authorize?client_id=vw28o8a3angs5e66bowr9zqqcji9dv&redirect_uri=${location.href}&response_type=token&scope=user:read:follows`
 }
 
 twitch.handleToken = async (callback = null) => {

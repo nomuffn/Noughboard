@@ -42,7 +42,7 @@
             <b-button @click="loginTwitch">Login to twitch</b-button>
         </div>
         <b-field class="mt-2" label="Add streamer by pressing enter">
-            <ListInput v-model="input.streamers" />
+            <ListInput v-model="editStreamers" />
         </b-field>
     </div>
 </template>
@@ -66,12 +66,16 @@ export default {
         return {
             streamers: [],
             twitchAuthenticated: false,
+            editStreamers: []
+        }
+    },
+    watch: {
+        editStreamers(newval, oldval) {
+            this.input.streamers = this.editStreamers
         }
     },
     async mounted() {
-        if (!this.input.streamers) {
-            this.input.streamers = []
-        }
+        this.editStreamers = this.input.streamers || []
 
         // TODO move logic to lib/twitch.js
         this.twitchAuthenticated = twitch.isAuthenticated()

@@ -18,7 +18,7 @@ const allBlocks = [
         code: 'counter',
     },
     {
-        name: 'Lambda (kidna WIP)',
+        name: 'Lambda',
         code: 'lambda',
     },
     {
