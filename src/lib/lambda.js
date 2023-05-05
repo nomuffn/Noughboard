@@ -12,13 +12,14 @@ export class Lambda {
     }
 }
 
-export const defaultLambda = `const url = "";
+export const defaultLambda = `const exampleDate = new Date().toLocaleDateString()
+
 const config = { headers: { auth: 0 } };
-const result = await this.axios.get(url, config);
-return [
-    {
-        type: "text",
-        value: result,
-        style: "font-weight: bold"
-    }
-];`
+const result = await this.axios.get("https://jsonplaceholder.typicode.com/todos/1", config);
+
+return \`
+<p style="font-weight: bold" >Date</p>
+<p>\${exampleDate}</p>
+<p style="font-weight: bold" >API Request</p>
+<p>\${JSON.stringify(result.data)}</p>
+\``

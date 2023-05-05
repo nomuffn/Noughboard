@@ -36,6 +36,7 @@
             </template>
         </section>
         <footer class="modal-card-foot">
+            <b-button label="Archive" type="is-warning" v-if="block.id" />
             <b-button
                 :label="deleteSure ? 'Sure?' : 'Delete'"
                 type="is-danger"
@@ -43,6 +44,8 @@
                 v-if="block.id"
                 @click="deleteBlock()"
             />
+            <b-button label="Import" />
+            <b-button label="Export" />
             <b-button label="Close" @click="$emit('close')" />
             <b-button
                 label="Save"

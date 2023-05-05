@@ -23,9 +23,9 @@
             class="my-2"
             :tasks="tasks"
             @update="loadTasks()"
-            :daily="input.daily"
+            :dailyResetTime="input.daily ? input.dailyResetTime : null"
         />
-        <p v-if="input.daily">Tasks reset in {{ dailyResetHoursLeft }}</p>
+        <p v-if="input.daily">Tasks reset in {{ dailyResetTimeLeft }}</p>
     </div>
     <div v-else>
         <b-field label="Category">
@@ -55,6 +55,7 @@ export default {
     data() {
         return {
             tasks: [],
+            dailyResetTimeLeft: '...',
         }
     },
     props: {
@@ -68,24 +69,47 @@ export default {
         },
     },
     timers: {
-        log: { time: 1000, autostart: true },
-    },
-    mounted() {
-        if (!this.edit) this.loadTasks()
-    },
-    computed: {
-        dailyResetHoursLeft() {
-            // TODO interval to refresh numbers
-            const date = new Date(Date.parse(this.input.dailyResetTime))
-            const now = new Date()
-            const remHours = 23 - (date.getHours() + now.getHours())
-            const remMinutes = 59 - (date.getMinutes() + now.getMinutes())
-            return `${remHours}hrs ${remMinutes}m`
+        dailyTimer: {
+            time: 1000,
+            repeat: true,
+            immediate: true,
         },
     },
+    mounted() {
+        if (!this.edit) {
+            this.loadTasks()
+
+            if (this.input.daily) this.$timer.start('dailyTimer')
+        }
+    },
     methods: {
-        log() {
-            console.log('Hello world')
+        dailyTimer() {
+            console.log('task timer')
+
+            // only yoink hours & minutes from resetTime
+            let resetTime = new Date(Date.parse(this.input.dailyResetTime))
+            resetTime.setDate(resetTime.getDate() - 7)
+
+            let date = new Date()
+            date.setHours(resetTime.getHours(), resetTime.getMinutes(), 0)
+
+            const now = new Date()
+            if (date - now < 0) {
+                date.setDate(date.getDate() + 1)
+            }
+            const delta = date - now
+
+            var milliseconds = Math.floor((delta % 1000) / 100),
+                seconds = Math.floor((delta / 1000) % 60),
+                minutes = Math.floor((delta / (1000 * 60)) % 60),
+                hours = Math.floor((delta / (1000 * 60 * 60)) % 24)
+
+            this.dailyResetTimeLeft = `${hours}hrs ${minutes}m ${seconds}s`
+
+            // daily reset
+            if (hours == 0 && minutes == 0 && seconds == 0) {
+                this.loadTasks()
+            }
         },
         async loadTasks() {
             // always compare & save category in lowercase

@@ -63,8 +63,7 @@ export default {
             Object: Boolean,
             required: false,
         },
-        daily: {
-            Object: Boolean,
+        dailyResetTime: {
             default: false,
         },
     },
@@ -113,12 +112,27 @@ export default {
                 },
             })
         },
+        getDailyDate() {
+            let resetTime = new Date(Date.parse(this.dailyResetTime))
+            resetTime.setDate(resetTime.getDate() - 7)
+
+            let date = new Date()
+            date.setHours(resetTime.getHours(), resetTime.getMinutes(), 0)
+
+            const now = new Date()
+
+            if (date - now > 0) {
+                now.setDate(now.getDate() - 1)
+            }
+            console.log({now})
+            return now
+        },
         async toggleComplete(task) {
-            if (this.daily) {
+            if (this.dailyResetTime) {
                 const state = {
                     type: 'dailytask',
                     id: task.id,
-                    date: new Date().toLocaleDateString(),
+                    date: this.getDailyDate().toLocaleDateString(),
                 }
 
                 const taskState = await db.states.get(state)
@@ -133,11 +147,11 @@ export default {
             }
         },
         async isDone(task) {
-            if (this.daily) {
+            if (this.dailyResetTime) {
                 const state = {
                     type: 'dailytask',
                     id: task.id,
-                    date: new Date().toLocaleDateString(),
+                    date: this.getDailyDate().toLocaleDateString(),
                 }
 
                 const taskState = await db.states.get(state)

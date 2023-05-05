@@ -4,12 +4,7 @@
             <b-loading v-if="loading" v-model="loading" />
             <div class="result" v-else-if="result">
                 <p class="remaining" v-if="input.repeat > 0">~{{ getRemainingTime }}</p>
-                <div v-for="item in result" :key="item.type + item.value">
-                    <!-- move all of this to an extra lambda wrapper/render component? -->
-                    <template v-if="item.type == 'text'">
-                        <p :style="item.style" v-html="item.value" />
-                    </template>
-                </div>
+                <div class="my-2 result-html" v-html="result"></div>
             </div>
 
             <div v-else>error</div>
@@ -17,13 +12,23 @@
             <!-- render lambda result; array of extra blocks to render? text, lists, images whatever -->
         </div>
         <div class="edit" v-else>
-            <label for="minmax-buttons"
-                >(Optional) Run every x minutes after the initial render</label
-            >
-            <b-numberinput v-model="input.repeat" id="minmax-buttons" min="0" ax="100" />
+            <p>Code is ran on page load</p>
+            <p>After you can repeat it after X minutes</p>
+            <p>0 means never</p>
+            <b-numberinput
+                class="my-2"
+                v-model="input.repeat"
+                id="minmax-buttons"
+                min="0"
+                ax="100"
+            />
 
-            <ScriptEditor v-model="input.lambda" />
+            <ScriptEditor
+                v-model="inputLambda"
+                class="my-2"
+            />
             <b-button
+                class="my-2"
                 label="Test run code"
                 icon-right="check"
                 @click="checkCode()"
@@ -55,55 +60,62 @@ export default {
             loading: false,
             result: null,
             remainingTime: 0,
+            inputLambda: this.input.lambda
         }
     },
-
+    timers: {
+        lambdaTimer: {
+            time: 1000,
+            repeat: true,
+            immediate: true,
+        },
+    },
+    created() {
+        // if (this.edit) {
+        //     if (!this.inputLambda) this.inputLambda = defaultLambda
+        // }
+    },
     async mounted() {
         if (!this.edit) {
             await this.runCode()
 
-            this.startIntervals()
+            if (!isNaN(this.input.repeat) && this.input.repeat > 0) {
+                this.remainingTime = this.input.repeat * 60
+                this.$timer.start('lambdaTimer')
+            }
         } else {
             if (!this.inputLambda) this.inputLambda = defaultLambda
         }
     },
-    updated() {
-        this.startIntervals()
+    watch: {
+        inputLambda(newval, oldval) {
+            // TODO use emits properly
+            this.input.lambda = this.inputLambda
+        }
     },
     computed: {
-        inputLambda: {
-            get() {
-                return this.input.lambda
-            },
-            set(val) {
-                this.input.lambda = val
-            },
-        },
+        // inputLambda: {
+        //     get() {
+        //         return this.input.lambda
+        //     },
+        //     set(val) {
+        //         this.input.lambda = val
+        //     },
+        // },
         getRemainingTime() {
-            const seconds = 60 * this.input.repeat - this.remainingTime
-            const remaining = Math.round(seconds / 60, 0)
-            if (remaining <= 1) return `${seconds} s`
-            return `${remaining} m`
+            const seconds = this.remainingTime
+            const minutes = Math.round(seconds / 60, 0)
+            if (minutes <= 1) return `${seconds} s`
+            return `${minutes} m`
         },
     },
     methods: {
-        async startIntervals() {
-            // TODO find a way to properly clear old intervals. beforeUnmount doesnt work cause component is not correctly unmounted? Maybe store all intervals in a global object or vuex storage? This only works the way it does cause in Home i set this.blocks = [] so no components are reused. Question if thats better this way or if components should be reused. Furthermore the intervals wouldnt be cleared if the block was deleted
-            // keep in mind that it should work with multiple lambda blocks and each having their own intervals
-            // clearInterval(window.repeat)
-            // clearInterval(window.counter)
-
-            const interval = this.input.repeat
-            if (!isNaN(interval) && interval > 0) {
-                // TODO combine both intervals to one that counts the seconds and just checks when it should run by dividing
-                const repeat = setInterval(async () => {
-                    this.remainingTime = 0
-                    await this.runCode()
-                }, interval * 1000 * 60)
-                const counter = setInterval(() => {
-                    this.remainingTime += 1
-                    console.log('remainingTime', this.remainingTime)
-                }, 1000)
+        async lambdaTimer() {
+            if (this.remainingTime == 0) {
+                await this.runCode()
+                this.remainingTime = this.input.repeat * 60
+            } else {
+                this.remainingTime--
             }
         },
         async runCode() {
@@ -147,4 +159,17 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.result {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+.remaining {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    font-size: 85%;
+    opacity: 50%;
+}
+</style>

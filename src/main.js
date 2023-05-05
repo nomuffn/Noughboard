@@ -5,12 +5,12 @@ import router from './router'
 import store from './store'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
+import VueTimers from 'vue-timers'
 
 import Buefy from 'buefy'
 import 'buefy/dist/buefy.css'
 import '@mdi/font/css/materialdesignicons.css'
 import './assets/bulmatheme.css'
-
 import { ToastProgrammatic } from 'buefy'
 
 import '@/components/index.js'
@@ -27,6 +27,7 @@ const main = new Vue({
 
 Vue.use(Buefy)
 Vue.use(VueAxios, axios)
+Vue.use(VueTimers)
 
 Vue.prototype.$toast = ToastProgrammatic
 
