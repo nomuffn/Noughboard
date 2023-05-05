@@ -10,7 +10,7 @@
         :use-css-transforms="true"
         @layout-updated="layoutUpdatedEvent"
         :response="true"
-        :vertical-compact="true"
+        :vertical-compact="dashboard.verticalCompact"
         :is-mirrored="false"
     >
         <grid-item
@@ -50,10 +50,10 @@ export default {
             required: true,
             type: Array,
         },
-        dashboardId: {
+        dashboard: {
             required: false,
-            type: Number,
-            default: 0,
+            type: Object,
+            default: {},
         },
     },
     created() {
@@ -78,7 +78,7 @@ export default {
                 component: EditBlockModal,
                 hasModalCard: true,
                 trapFocus: true,
-                props: { item, dashboardId: this.dashboardId },
+                props: { item, dashboardId: this.dashboard.id },
                 events: {
                     close: () => {
                         this.$emit('update')

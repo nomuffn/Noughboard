@@ -46,7 +46,7 @@
         </div>
 
         <BlocksWrapper
-            :dashboardId="dashboard.id"
+            :dashboard="dashboard"
             :blocks="blocks"
             @update="loadBlocks()"
         />
@@ -56,12 +56,13 @@
 </template>
 
 <script>
-import EditBlockModal from '@/components/modals/EditBlockModal.vue'
 import { db } from '../lib/db'
 // import is needed for db functions: import {importDB, exportDB, importInto, peakImportFile} from "dexie-export-import";
 import { importDB, exportDB, importInto, peakImportFile } from 'dexie-export-import'
-
 import twitch from '@/lib/twitch'
+
+import EditBlockModal from '@/components/modals/EditBlockModal.vue'
+import EditDashboard from '@/components/modals/EditDashboard.vue'
 
 export default {
     name: 'Home',
@@ -105,31 +106,45 @@ export default {
             this.dashboards = await db.dashboards.toArray()
 
             if (!this.dashboards.length) {
-                await db.dashboards.add({ title: 'Home' })
+                await db.dashboards.add({ title: 'Home', verticalCompact: true })
                 return this.loadDashboard()
             }
-
-            this.loadBlocks()
         },
         async editDashboard(neww = false) {
-            this.$buefy.dialog.prompt({
-                message: `Dashboard title`,
-                inputAttrs: {
-                    value: neww ? '' : this.dashboard.title,
-                    maxlength: 15,
-                },
+            console.log(this.dashboard)
+            this.$buefy.modal.open({
+                parent: this,
+                component: EditDashboard,
+                hasModalCard: true,
                 trapFocus: true,
-                onConfirm: async (title) => {
-                    if (neww) {
-                        await db.dashboards.add({ title })
+                props: { dashboard: neww ? {} : {...this.dashboard} },
+                events: {
+                    close: async () => {
                         await this.loadDashboards()
-                        this.currentDashboard = this.dashboards.length - 1
-                    } else {
-                        await db.dashboards.put({ ...this.dashboard, title })
-                        this.loadDashboards()
-                    }
+                        if (neww || this.currentDashboard >= this.dashboards.length) {
+                            this.currentDashboard = this.dashboards.length - 1
+                        }
+                    },
                 },
             })
+            // this.$buefy.dialog.prompt({
+            //     message: `Dashboard title`,
+            //     inputAttrs: {
+            //         value: neww ? '' : this.dashboard.title,
+            //         maxlength: 15,
+            //     },
+            //     trapFocus: true,
+            //     onConfirm: async (title) => {
+            //         if (neww) {
+            //             await db.dashboards.add({ title })
+            //             await this.loadDashboards()
+            //             this.currentDashboard = this.dashboards.length - 1
+            //         } else {
+            //             await db.dashboards.put({ ...this.dashboard, title })
+            //             this.loadDashboards()
+            //         }
+            //     },
+            // })
         },
         addBlock(prefire = null) {
             this.$buefy.modal.open({
@@ -146,6 +161,7 @@ export default {
             })
         },
         async loadBlocks() {
+            console.log("loadblocks")
             this.blocks = [] // dont reuse components
             this.blocks = await db.blocks
                 .filter((block) => block.dashboard == this.dashboard.id)

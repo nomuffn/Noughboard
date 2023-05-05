@@ -75,7 +75,6 @@ export default {
     },
     created() {
         // reset block
-        this.deleteSure = false
         if (this.item) this.block = structuredClone(this.item)
     },
     mounted() {
@@ -116,14 +115,7 @@ export default {
 
             await db.blocks.delete(this.block.id)
             this.$emit('close')
-        },
-    },
-    watch: {
-        value(newval, oldval) {
-            this.modalActive = newval
-        },
-        modalActive(newval, oldval) {
-            this.$emit('input', newval)
+            this.deleteSure = false
         },
     },
     computed: {

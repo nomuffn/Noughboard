@@ -29,7 +29,7 @@
     </div>
     <div v-else>
         <b-field label="Category">
-            <b-input v-model="input.category" type="textarea"></b-input>
+            <b-input v-model="input.category"></b-input>
         </b-field>
         <b-field label="Daily Tasks">
             <b-checkbox v-model="input.daily"> Active </b-checkbox>
@@ -80,6 +80,11 @@ export default {
             this.loadTasks()
 
             if (this.input.daily) this.$timer.start('dailyTimer')
+        } else {
+            if (!this.input.dailyResetTime) {
+                this.input.dailyResetTime = new Date()
+                this.input.dailyResetTime.setHours(0, 0)
+            }
         }
     },
     methods: {
