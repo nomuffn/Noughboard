@@ -9,11 +9,17 @@
                     type="is-text"
                     @click="openHistory()"
                 />
-                <b-button icon-right="archive" type="is-text" @click="openArchive()" />
+                <b-button
+                    v-if="!input.daily"
+                    icon-right="archive"
+                    type="is-text"
+                    @click="openArchive()"
+                />
                 <b-button icon-right="plus" type="is-text" @click="newTask()" />
             </div>
         </div>
         <TasksViewer
+            v-if="tasks.length"
             class="my-2"
             :tasks="tasks"
             @update="loadTasks()"
@@ -78,6 +84,7 @@ export default {
         async loadTasks() {
             // always compare & save category in lowercase
             // TODO implement created_at & updated_at
+            this.tasks = []
             this.tasks = await db.tasks
                 .filter(
                     (task) =>

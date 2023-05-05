@@ -5,24 +5,23 @@
                 class="m-3"
                 type="is-text"
                 icon-right="arrow-left"
-                @click="loadDashboard(-1)"
+                :disabled="currentDashboard <= 0"
+                @click="currentDashboard--"
             />
-            <p>{{ dashboard.title }}</p>
-            <b-button type="is-text" icon-right="pencil" @click="editDashboard()" />
-            <b-button
-                class="m-3"
-                type="is-text"
-                icon-right="plus"
-                @click="editDashboard(true)"
-            />
+            <div class="flex items-center p-3 rounded-md bg-slate-700">
+                <p class="mr-2 text-2xl font-bold">{{ dashboard.title }}</p>
+                <b-button type="is-text" icon-right="pencil" @click="editDashboard()" />
+                <b-button type="is-text" icon-right="plus" @click="editDashboard(true)" />
+            </div>
             <b-button
                 class="m-3"
                 type="is-text"
                 icon-right="arrow-right"
-                @click="loadDashboard(1)"
+                :disabled="currentDashboard >= dashboards.length - 1"
+                @click="currentDashboard++"
             />
         </div>
-        <div class="flex mt-4 mx-4 p-3 rounded-md bg-slate-800 max-w-50 self-center">
+        <div class="flex mt-3 mx-4 p-3 rounded-md bg-slate-800 max-w-50 self-center">
             <b-button
                 class="m-3"
                 type="is-primary"
@@ -70,11 +69,23 @@ export default {
         return {
             // cant use live query, it would loop the saves, can probably be throttled but this is fine for now. dont need livequeries
             blocks: [],
-            dashboard: null,
+            dashboards: null,
+            currentDashboard: 0,
         }
     },
+    computed: {
+        dashboard() {
+            if (!this.dashboards?.length) return null
+            return this.dashboards[this.currentDashboard]
+        },
+    },
+    watch: {
+        dashboard(newval, oldval) {
+            this.loadBlocks()
+        },
+    },
     async mounted() {
-        await this.loadDashboard()
+        await this.loadDashboards()
         // this.$toast.open({
         //     duration: 5000,
         //     message: `danger toast test, Something's not good, also I'm on <b>bottom</b>`,
@@ -90,21 +101,14 @@ export default {
         twitch.handleToken()
     },
     methods: {
-        async loadDashboard(indexAdd = 0) {
-            const dashboards = await db.dashboards.toArray()
+        async loadDashboards() {
+            this.dashboards = await db.dashboards.toArray()
 
-            if (!dashboards.length) {
+            if (!this.dashboards.length) {
                 await db.dashboards.add({ title: 'Home' })
                 return this.loadDashboard()
             }
 
-            if (indexAdd == 0) {
-                this.dashboard = dashboards[0]
-            } else {
-                const index =
-                    indexAdd + dashboards.map((i) => i.id).indexOf(this.dashboard.id)
-                this.dashboard = dashboards[index]
-            }
             this.loadBlocks()
         },
         async editDashboard(neww = false) {
@@ -118,11 +122,11 @@ export default {
                 onConfirm: async (title) => {
                     if (neww) {
                         await db.dashboards.add({ title })
-                        this.loadDashboard((await db.dashboards.count()) - 1)
+                        await this.loadDashboards()
+                        this.currentDashboard = this.dashboards.length - 1
                     } else {
                         await db.dashboards.put({ ...this.dashboard, title })
-                        this.dashboard = { ...this.dashboard, title }
-                        this.loadDashboard(0)
+                        this.loadDashboards()
                     }
                 },
             })
@@ -178,6 +182,5 @@ export default {
             })
         },
     },
-    watch: {},
 }
 </script>

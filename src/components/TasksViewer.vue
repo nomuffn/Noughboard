@@ -14,7 +14,7 @@
                 >
                     <div>
                         <b-checkbox
-                            :value="states[task.id]"
+                            v-model="states[task.id]"
                             @input="toggleComplete(task)"
                         >
                             {{ task.content }}
@@ -74,12 +74,15 @@ export default {
             mutableTasks: this.tasks,
         }
     },
-    async created() {
+    async mounted() {
         let states = []
+        console.log([...this.tasks])
         for (const task of this.tasks) {
+            console.log(task)
             states[task.id] = await this.isDone(task)
         }
         this.states = states
+        console.log(this.states)
     },
     watch: {
         tasks(newval, oldval) {
@@ -117,38 +120,37 @@ export default {
         async toggleComplete(task) {
             console.log('completeTask')
             if (this.daily) {
-                let date = new Date()
-                date.setHours(0, 0, 0, 0)
+                const state = {
+                    type: 'dailytask',
+                    id: task.id,
+                    date: new Date().toLocaleDateString(),
+                }
 
-                const state = { taskId: task.id, date: date }
-
-                const taskState = await db.tasksState.get(state)
+                const taskState = await db.states.get(state)
                 if (taskState) {
-                    await db.tasksState.where(state).delete()
+                    await db.states.where(state).delete()
                 } else {
-                    await db.tasksState.add(state)
+                    await db.states.add(state)
                 }
             } else {
-                await db.tasks.update(task.id, { done: !this.states[task.id] })
+                await db.tasks.update(task.id, { done: this.states[task.id] })
                 // this.$emit('update')
             }
-            this.states[task.id] = !task.done
         },
         async isDone(task) {
             if (this.daily) {
-                let date = new Date()
-                date.setHours(0, 0, 0, 0)
-
-                const state = { taskId: task.id, date: date }
-
-                const taskState = await db.tasksState.get(state)
-                if (taskState) {
-                    return true
-                } else {
-                    return false
+                const state = {
+                    type: 'dailytask',
+                    id: task.id,
+                    date: new Date().toLocaleDateString(),
                 }
+
+                const taskState = await db.states.get(state)
+
+                if (taskState) return true
+                else return false
             } else {
-                return task.done
+                return task.done != null ? task.done : false
             }
         },
     },

@@ -4,7 +4,7 @@
             <p class="modal-card-title">Done'd tasks for '{{ category }}'</p>
         </header>
         <section class="modal-card-body">
-            <TasksViewer :tasks="tasks" :archive="true" />
+            <TasksViewer v-if="tasks.length" :tasks="tasks" :archive="true" />
         </section>
         <footer class="modal-card-foot">
             <b-button label="Close" @click="$emit('close')" />

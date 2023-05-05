@@ -22,6 +22,10 @@ const allBlocks = [
         code: 'lambda',
     },
     {
+        name: 'Diary (WIP, like counter?)',
+        code: 'diary',
+    },
+    {
         name: 'Bookmark (WIP)',
         code: 'bookmark',
     },
