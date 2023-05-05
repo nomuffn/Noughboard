@@ -9,17 +9,21 @@
             <b-field label="Title">
                 <b-input v-model="dashboardData.title"></b-input>
             </b-field>
+            <b-field label="Icon key (https://pictogrammers.com/library/mdi/)">
+                <b-input v-model="dashboardData.icon"></b-input>
+            </b-field>
             <b-checkbox v-model="dashboardData.verticalCompact"
                 >Vertically compact</b-checkbox
             >
         </section>
         <footer class="modal-card-foot">
-            <b-button 
-            v-if="isNew" 
-            :label="deleteSure ? 'Sure?' : 'Delete'"
-            class="mr-auto"
-            type="is-danger"
-            @click="deleteDb" />
+            <b-button
+                v-if="isNew"
+                :label="deleteSure ? 'Sure?' : 'Delete'"
+                class="mr-auto"
+                type="is-danger"
+                @click="deleteDb"
+            />
 
             <b-button label="Close" @click="$emit('close')" />
             <b-button
@@ -54,14 +58,14 @@ export default {
     methods: {
         async save() {
             await db.dashboards.put(this.dashboardData)
-            this.$emit("close")
+            this.$emit('close')
         },
         async deleteDb() {
             if (!this.deleteSure) return (this.deleteSure = true)
             await db.dashboards.delete(this.dashboardData.id)
             this.$emit('close')
             this.deleteSure = false
-        }
+        },
     },
     watch: {},
     computed: {
@@ -70,7 +74,7 @@ export default {
         },
         isNew() {
             return this.dashboardData.id >= 0
-        }
+        },
     },
 }
 </script>

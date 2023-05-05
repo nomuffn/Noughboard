@@ -13,7 +13,7 @@
         </div>
         <div class="edit" v-else>
             <p>Code is ran on page load</p>
-            <p>After you can repeat it after X minutes</p>
+            <p>After it can be ran ever X minutes</p>
             <p>0 means never</p>
             <b-numberinput
                 class="my-2"
@@ -23,10 +23,7 @@
                 ax="100"
             />
 
-            <ScriptEditor
-                v-model="inputLambda"
-                class="my-2"
-            />
+            <ScriptEditor v-model="inputLambda" class="my-2" />
             <b-button
                 class="my-2"
                 label="Test run code"
@@ -60,7 +57,7 @@ export default {
             loading: false,
             result: null,
             remainingTime: 0,
-            inputLambda: this.input.lambda
+            inputLambda: this.input.lambda,
         }
     },
     timers: {
@@ -91,7 +88,7 @@ export default {
         inputLambda(newval, oldval) {
             // TODO use emits properly
             this.input.lambda = this.inputLambda
-        }
+        },
     },
     computed: {
         // inputLambda: {

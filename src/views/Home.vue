@@ -8,11 +8,48 @@
                 :disabled="currentDashboard <= 0"
                 @click="currentDashboard--"
             />
-            <div class="flex items-center p-3 rounded-md bg-slate-700">
-                <p class="mr-2 text-2xl font-bold">{{ dashboard.title }}</p>
-                <b-button type="is-text" icon-right="pencil" @click="editDashboard()" />
-                <b-button type="is-text" icon-right="plus" @click="editDashboard(true)" />
-            </div>
+            <b-dropdown
+                v-model="currentDashboard"
+                :triggers="['hover']"
+                :scrollable="true"
+                :max-height="250"
+                aria-role="list"
+            >
+                <template #trigger>
+                    <div class="flex items-center py-3 px-5 rounded-md bg-slate-700">
+                        <p class="mr-4 text-2xl font-bold">{{ dashboard.title }}</p>
+                        <b-icon icon="menu-down"> </b-icon>
+                    </div>
+                </template>
+
+                <b-dropdown-item
+                    v-for="(item, index) in dashboards"
+                    :key="index"
+                    :value="index"
+                    aria-role="listitem"
+                    style="padding-right: 10px"
+                >
+                    <div class="flex items-center">
+                        <b-icon :icon="item.icon || 'home'"></b-icon>
+                        <p class="mx-4 text-lg font-bold">{{ item.title }}</p>
+                        <b-button
+                            class="ml-auto"
+                            type="is-text"
+                            icon-right="pencil"
+                            @click.stop="editDashboard(false, index)"
+                        />
+                    </div>
+                </b-dropdown-item>
+                <div class="flex justify-center">
+                    <b-button
+                        @click="editDashboard(true)"
+                        type="is-text"
+                        icon-right="plus"
+                    />
+                </div>
+            </b-dropdown>
+            <!-- <div class="flex items-center p-3 rounded-md bg-slate-700">
+            </div> -->
             <b-button
                 class="m-3"
                 type="is-text"
@@ -45,11 +82,7 @@
             />
         </div>
 
-        <BlocksWrapper
-            :dashboard="dashboard"
-            :blocks="blocks"
-            @update="loadBlocks()"
-        />
+        <BlocksWrapper :dashboard="dashboard" :blocks="blocks" @update="loadBlocks()" />
         <!-- <EditBlockModal v-model="showEditModal" @update="loadBlocks()" /> -->
     </div>
     <div v-else>Something went wrong while loading a dashboard</div>
@@ -72,6 +105,7 @@ export default {
             blocks: [],
             dashboards: null,
             currentDashboard: 0,
+            currentMenu: null,
         }
     },
     computed: {
@@ -110,14 +144,13 @@ export default {
                 return this.loadDashboard()
             }
         },
-        async editDashboard(neww = false) {
-            console.log(this.dashboard)
+        async editDashboard(neww = false, index = this.currentDashboard) {
             this.$buefy.modal.open({
                 parent: this,
                 component: EditDashboard,
                 hasModalCard: true,
                 trapFocus: true,
-                props: { dashboard: neww ? {} : {...this.dashboard} },
+                props: { dashboard: neww ? {} : { ...this.dashboards[index] } },
                 events: {
                     close: async () => {
                         await this.loadDashboards()
@@ -127,24 +160,6 @@ export default {
                     },
                 },
             })
-            // this.$buefy.dialog.prompt({
-            //     message: `Dashboard title`,
-            //     inputAttrs: {
-            //         value: neww ? '' : this.dashboard.title,
-            //         maxlength: 15,
-            //     },
-            //     trapFocus: true,
-            //     onConfirm: async (title) => {
-            //         if (neww) {
-            //             await db.dashboards.add({ title })
-            //             await this.loadDashboards()
-            //             this.currentDashboard = this.dashboards.length - 1
-            //         } else {
-            //             await db.dashboards.put({ ...this.dashboard, title })
-            //             this.loadDashboards()
-            //         }
-            //     },
-            // })
         },
         addBlock(prefire = null) {
             this.$buefy.modal.open({
@@ -161,7 +176,7 @@ export default {
             })
         },
         async loadBlocks() {
-            console.log("loadblocks")
+            console.log('loadblocks')
             this.blocks = [] // dont reuse components
             this.blocks = await db.blocks
                 .filter((block) => block.dashboard == this.dashboard.id)
@@ -196,3 +211,8 @@ export default {
     },
 }
 </script>
+<style lang="scss" scoped>
+.dropdown-menu {
+    min-width: 0 !important;
+}
+</style>

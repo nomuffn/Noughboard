@@ -6,8 +6,8 @@
             </p>
         </header>
         <section class="modal-card-body">
-            <b-dropdown v-model="block.type" aria-role="list">
-                <template #trigger="{ active }" class="shadow">
+            <b-dropdown v-model="block.type" aria-role="list" :scrollable="true">
+                <template #trigger="{ active }">
                     <b-button
                         :label="block.type.name"
                         type="is-primary"
@@ -20,6 +20,7 @@
                     :key="block.code"
                     :value="block"
                     aria-role="listitem"
+                    :disabled="block.name.includes('WIP')"
                     >{{ block.name }}</b-dropdown-item
                 >
             </b-dropdown>
@@ -36,7 +37,7 @@
             </template>
         </section>
         <footer class="modal-card-foot">
-            <b-button label="Archive" type="is-warning" v-if="block.id" />
+            <b-button disabled label="Archive" type="is-warning" v-if="block.id" />
             <b-button
                 :label="deleteSure ? 'Sure?' : 'Delete'"
                 type="is-danger"
@@ -44,8 +45,8 @@
                 v-if="block.id"
                 @click="deleteBlock()"
             />
-            <b-button label="Import" />
-            <b-button label="Export" />
+            <b-button disabled label="Import" />
+            <b-button disabled label="Export" />
             <b-button label="Close" @click="$emit('close')" />
             <b-button
                 label="Save"
