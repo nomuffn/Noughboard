@@ -59,27 +59,35 @@
             />
         </div>
         <div class="flex mt-3 mx-4 p-3 rounded-md bg-slate-800 max-w-50 self-center">
-            <b-button
-                class="m-3"
-                type="is-primary"
-                icon-right="plus"
-                size="is-medium"
-                @click="addBlock"
-            />
-            <b-button
-                class="m-3"
-                type="is-primary"
-                icon-right="export-variant"
-                size="is-medium"
-                @click="exportDb"
-            />
-            <b-button
-                class="m-3"
-                type="is-primary"
-                icon-right="import"
-                size="is-medium"
-                @click="importDb"
-            />
+            <b-tooltip label="Add block" type="is-dark">
+                <b-button
+                    class="m-3"
+                    type="is-primary"
+                    icon-right="plus"
+                    size="is-medium"
+                    @click="addBlock"
+                />
+            </b-tooltip>
+
+            <b-tooltip label="Export dashboards" type="is-dark">
+                <b-button
+                    class="m-3"
+                    type="is-primary"
+                    icon-right="export-variant"
+                    size="is-medium"
+                    @click="exportDb"
+                />
+            </b-tooltip>
+
+            <b-tooltip label="Import dashboards" type="is-dark">
+                <b-button
+                    class="m-3"
+                    type="is-primary"
+                    icon-right="import"
+                    size="is-medium"
+                    @click="importDb"
+                />
+            </b-tooltip>
         </div>
 
         <BlocksWrapper :dashboard="dashboard" :blocks="blocks" @update="loadBlocks()" />
