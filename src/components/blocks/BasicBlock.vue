@@ -5,7 +5,7 @@
             !edit && 'rounded-md h-full w-full overflow-auto',
             !edit && !block.transparent && 'bg-slate-800',
             !edit && !block.showScroll && 'hideScroll',
-            !edit && block.type.code != 'image' && 'p-4',
+            !edit && block.type.code != 'image' && !block.noPadding && 'p-4',
         ]"
     >
         <component
@@ -24,6 +24,7 @@
                     Hide resize handle
                 </b-checkbox>
                 <b-checkbox v-model="block.showScroll"> Show scrollbar </b-checkbox>
+                <b-checkbox v-model="block.noPadding"> No padding </b-checkbox>
             </b-field>
         </div>
     </div>

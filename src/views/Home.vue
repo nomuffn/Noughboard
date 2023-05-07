@@ -69,7 +69,7 @@
                 />
             </b-tooltip>
 
-            <b-tooltip label="Export dashboards" type="is-dark">
+            <b-tooltip label="Export all data" type="is-dark">
                 <b-button
                     class="m-3"
                     type="is-primary"
@@ -79,7 +79,7 @@
                 />
             </b-tooltip>
 
-            <b-tooltip label="Import dashboards" type="is-dark">
+            <b-tooltip label="Import all data" type="is-dark">
                 <b-button
                     class="m-3"
                     type="is-primary"
@@ -104,6 +104,8 @@ import twitch from '@/lib/twitch'
 
 import EditBlockModal from '@/components/modals/EditBlockModal.vue'
 import EditDashboard from '@/components/modals/EditDashboard.vue'
+
+import defaultData from '@/lib/defaultData'
 
 export default {
     name: 'Home',
@@ -148,8 +150,8 @@ export default {
             this.dashboards = await db.dashboards.toArray()
 
             if (!this.dashboards.length) {
-                await db.dashboards.add({ title: 'Home', verticalCompact: true })
-                return this.loadDashboard()
+                await db.import(new Blob([defaultData]))
+                return this.loadDashboards()
             }
         },
         async editDashboard(neww = false, index = this.currentDashboard) {
@@ -197,15 +199,16 @@ export default {
             navigator.clipboard.writeText(dbBlob)
             this.$buefy.dialog.alert({
                 canCancel: true,
-                title: 'DB Blob',
-                message: 'copied to clipboard',
-                confirmText: 'yay',
+                title: 'Data Export',
+                message: 'Copied to your clipboard in JSON format',
+                confirmText: 'jupijej',
+                canCancel: ['escape', 'outside'],
             })
         },
         importDb() {
             this.$buefy.dialog.prompt({
-                message: `EVERYTHING WILL BE DELETED`,
-                message: `Enter db blob:`,
+                title: `EVERYTHING WILL BE DELETED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!`,
+                message: `Enter json from export:`,
                 canCancel: true,
                 onConfirm: async (json) => {
                     await db.tables.forEach(async (table) => {
@@ -214,6 +217,8 @@ export default {
                     await db.import(new Blob([json]))
                     this.loadBlocks()
                 },
+                cancelText: 'pls dont',
+                confirmText: 'YES DELETE AND REPLACE EVERYTHING!!!',
             })
         },
     },

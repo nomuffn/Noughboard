@@ -30,11 +30,12 @@
         </div>
     </div>
     <div v-else class="counterBlock">
+        <p class="mb-2">Resets every day</p>
         <b-field label="Title">
             <b-input v-model="input.title"></b-input>
             <!-- <b-input v-model="input.description" type="textarea"></b-input> -->
         </b-field>
-        <b-field label="identifier">
+        <b-field label="Unique identifier for database">
             <b-input v-model="input.key"></b-input>
             <!-- <b-input v-model="input.description" type="textarea"></b-input> -->
         </b-field>

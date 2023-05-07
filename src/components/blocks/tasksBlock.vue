@@ -8,6 +8,7 @@
                     icon-right="history"
                     type="is-text"
                     @click="openHistory()"
+                    :disabled="true"
                 />
                 <b-button
                     v-if="!input.daily"
@@ -28,7 +29,7 @@
         <p v-if="input.daily">Resets in {{ dailyResetTimeLeft }}</p>
     </div>
     <div v-else>
-        <b-field label="Category">
+        <b-field label="Category (also the identifier in the database rn)">
             <b-input v-model="input.category"></b-input>
         </b-field>
         <b-field label="Daily Tasks">

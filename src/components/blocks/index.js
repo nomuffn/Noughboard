@@ -26,11 +26,11 @@ const allBlocks = [
         code: 'image',
     },
     {
-        name: 'Diary (WIP, like counter?)',
+        name: 'Diary (WIP)',
         code: 'diary',
     },
     {
-        name: 'Bookmark (WIP)',
+        name: 'Bookmark/Links (WIP)',
         code: 'bookmark',
     },
     {

@@ -15,7 +15,15 @@
                 <b-numberinput v-model="task.priority"></b-numberinput>
             </b-field> -->
         </section>
-        <footer class="modal-card-foot">
+        <footer class="modal-card-foot justify-end">
+            <b-button
+                :label="deleteSure ? 'Sure?' : 'Delete'"
+                type="is-danger"
+                class="mr-auto"
+                v-if="task.id"
+                @click="deleteTask()"
+            />
+
             <b-button label="Close" @click="$emit('close')" />
             <b-button
                 label="Save"
@@ -45,6 +53,7 @@ export default {
                 content: '',
                 details: '',
             },
+            deleteSure: false,
         }
     },
     mounted() {
@@ -59,6 +68,13 @@ export default {
                 ...this.task,
             })
             this.$emit('close')
+        },
+        async deleteTask() {
+            if (!this.deleteSure) return (this.deleteSure = true)
+
+            await db.tasks.delete(this.task.id)
+            this.$emit('close')
+            this.deleteSure = false
         },
     },
     watch: {},

@@ -33,17 +33,15 @@
             </b-field>
 
             <template v-if="block.type">
-                <b-field label="Block content">
-                    <BasicBlock
-                        class="mt-4"
-                        :block="block"
-                        :edit="true"
-                        @submit="saveBlock"
-                    />
-                </b-field>
+                <BasicBlock
+                    class="mt-4"
+                    :block="block"
+                    :edit="true"
+                    @submit="saveBlock"
+                />
             </template>
         </section>
-        <footer class="modal-card-foot">
+        <footer class="modal-card-foot justify-end">
             <b-button disabled label="Archive" type="is-warning" v-if="block.id" />
             <b-button
                 :label="deleteSure ? 'Sure?' : 'Delete'"
@@ -143,9 +141,6 @@ export default {
         min-height: 25vh;
         min-width: 50vh;
         height: auto;
-    }
-    .modal-card-foot {
-        justify-content: flex-end;
     }
 }
 </style>
