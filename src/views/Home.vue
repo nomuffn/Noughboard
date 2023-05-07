@@ -93,7 +93,10 @@
         <BlocksWrapper :dashboard="dashboard" :blocks="blocks" @update="loadBlocks()" />
         <!-- <EditBlockModal v-model="showEditModal" @update="loadBlocks()" /> -->
     </div>
-    <div v-else>Something went wrong while loading a dashboard</div>
+    <div v-else>
+        <p>Something went wrong while loading a dashboard.</p>
+        <p>Try CTRL F5</p>
+    </div>
 </template>
 
 <script>
