@@ -16,10 +16,10 @@
                     {{
                         new Date(
                             new Date().setDate(date.getDate() - DAYS + 1),
-                        ).toLocaleDateString('de-DE')
+                        ).toLocaleDateString()
                     }}
                     -
-                    {{ date.toLocaleDateString('de-DE') }}
+                    {{ date.toLocaleDateString() }}
                 </p>
                 <b-button
                     class="m-1"
@@ -79,7 +79,7 @@ export default {
 
             let tempDate = new Date(this.date)
             for (let i = 0; i < this.DAYS; i++) {
-                let dateString = tempDate.toLocaleDateString('de-DE')
+                let dateString = tempDate.toLocaleDateString()
                 const state = {
                     type: 'counter',
                     id: this.id,
