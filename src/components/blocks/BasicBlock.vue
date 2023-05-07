@@ -1,6 +1,31 @@
 <template>
-    <div class="basicBlock">
-        <component :is="getBlock()" :input="block.inputValues" />
+    <div
+        :class="[
+            'basicBlock',
+            !edit && 'rounded-md h-full w-full overflow-auto',
+            !edit && !block.transparent && 'bg-slate-800',
+            !edit && !block.showScroll && 'hideScroll',
+            !edit && block.type.code != 'image' && 'p-4',
+        ]"
+    >
+        <component
+            :edit="edit"
+            :is="getBlock()"
+            :input="block.inputValues"
+            @submit="$emit('submit')"
+        />
+
+        <div v-if="edit" class="mt-4">
+            <b-field label="Extra options">
+                <b-checkbox v-model="block.transparent">
+                    Transparent background
+                </b-checkbox>
+                <b-checkbox v-model="block.hideResizeHandle">
+                    Hide resize handle
+                </b-checkbox>
+                <b-checkbox v-model="block.showScroll"> Show scrollbar </b-checkbox>
+            </b-field>
+        </div>
     </div>
 </template>
 
@@ -12,6 +37,10 @@ export default {
         ...components,
     },
     props: {
+        edit: {
+            Object: Boolean,
+            default: false,
+        },
         block: {
             required: true,
             type: Object,
@@ -29,5 +58,9 @@ export default {
 <style lang="scss">
 .basicBlock {
     user-select: none;
+
+    &.hideScroll::-webkit-scrollbar {
+        display: none;
+    }
 }
 </style>

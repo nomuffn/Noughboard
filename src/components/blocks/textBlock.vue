@@ -6,9 +6,15 @@
         <div v-html="input.text" />
     </div>
     <div v-else class="textBlock">
-        <b-field label="Content">
-            <VueEditor v-model="input.text" />
-        </b-field>
+        <!-- 
+            full page would require to emit a new event back to Blockswrapper and/or Home. In there you need to reopen the modal in fullscreen. Reutizilize the prefire var to also save the block options & inputvalues and reload the modal in fullscreen with previous values
+         -->
+        <b-checkbox v-model="input.fullPage"> Use full page (WIP) </b-checkbox>
+        <VueEditor class="my-2" ref="editor" v-model="input.text" />
+        <div class="opacity-50">
+            <p>Save: ctrl + s</p>
+            <p>Undo: ctrl + z</p>
+        </div>
     </div>
 </template>
 
@@ -17,7 +23,21 @@ import { VueEditor } from 'vue2-editor'
 
 export default {
     components: { VueEditor },
-    mounted() {},
+    mounted() {
+        if (this.edit) {
+            setTimeout(() => {
+                this.$refs.editor.quill.focus()
+                this.$refs.editor.quill.keyboard.addBinding({
+                    key: 's',
+                    ctrlKey: true,
+                    handler: (range, context) => {
+                        console.log('ctrl enter')
+                        this.$emit('submit')
+                    },
+                })
+            }, 200)
+        }
+    },
     props: {
         input: {
             Object: Object,

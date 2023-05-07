@@ -62,17 +62,24 @@ export default {
             default: false,
         },
     },
+    timers: {
+        loadStreamers: {
+            time: 1000 * 60 * 15, // every 15 minutes
+            repeat: true,
+            immediate: true,
+        },
+    },
     data() {
         return {
             streamers: [],
             twitchAuthenticated: false,
-            editStreamers: []
+            editStreamers: [],
         }
     },
     watch: {
         editStreamers(newval, oldval) {
             this.input.streamers = this.editStreamers
-        }
+        },
     },
     async mounted() {
         this.editStreamers = this.input.streamers || []
@@ -81,10 +88,16 @@ export default {
         this.twitchAuthenticated = twitch.isAuthenticated()
 
         if (!this.edit) {
-            this.streamers = await twitch.getStreamers(this.input.streamers)
+            this.$timer.start('loadStreamers')
         }
     },
     methods: {
+        async loadStreamers() {
+            // show timer counting down until next refresh
+            if (this.twitchAuthenticated) {
+                this.streamers = await twitch.getStreamers(this.input.streamers)
+            }
+        },
         hoursAgo(date) {
             return (
                 Math.round(Math.abs((Date.now() - Date.parse(date)) / 36e5), 3) + ' hrs'

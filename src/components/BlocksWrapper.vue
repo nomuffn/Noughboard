@@ -22,11 +22,9 @@
             :i="item.i"
             :key="item.i"
             drag-ignore-from=".draggable"
+            :class="[item.hideResizeHandle && 'hideResizeHandle']"
         >
-            <div
-                class="bg-slate-800 rounded-md h-full w-full p-4 overflow-auto"
-                @contextmenu.prevent="() => editBlock(item)"
-            >
+            <div class="w-full h-full" @contextmenu.prevent="() => editBlock(item)">
                 <BasicBlock :block="item" />
             </div>
         </grid-item>
@@ -78,6 +76,7 @@ export default {
                 component: EditBlockModal,
                 hasModalCard: true,
                 trapFocus: true,
+                fullScreen: false,
                 props: { item, dashboardId: this.dashboard.id },
                 events: {
                     close: () => {
@@ -97,6 +96,7 @@ export default {
 .vue-grid-item {
     touch-action: none;
 }
+
 .vue-resizable-handle {
     background: none !important;
     border: solid grey;
@@ -106,5 +106,9 @@ export default {
     width: 10px !important;
     height: 10px !important;
     border-radius: 1px;
+}
+
+.hideResizeHandle .vue-resizable-handle {
+    opacity: 0;
 }
 </style>

@@ -6,34 +6,41 @@
             </p>
         </header>
         <section class="modal-card-body">
-            <b-dropdown v-model="block.type" aria-role="list" :scrollable="true">
-                <template #trigger="{ active }">
-                    <b-button
-                        :label="block.type.name"
-                        type="is-primary"
-                        :icon-right="active ? 'menu-up' : 'menu-down'"
-                    />
-                </template>
-
-                <b-dropdown-item
-                    v-for="block in allBlocks"
-                    :key="block.code"
-                    :value="block"
-                    aria-role="listitem"
-                    :disabled="block.name.includes('WIP')"
-                    >{{ block.name }}</b-dropdown-item
+            <b-field label="Block type">
+                <b-dropdown
+                    v-model="block.type"
+                    aria-role="list"
+                    :scrollable="true"
+                    :max-height="500"
                 >
-            </b-dropdown>
+                    <template #trigger="{ active }">
+                        <b-button
+                            :label="block.type.name"
+                            type="is-primary"
+                            :icon-right="active ? 'menu-up' : 'menu-down'"
+                        />
+                    </template>
+
+                    <b-dropdown-item
+                        v-for="block in allBlocks"
+                        :key="block.code"
+                        :value="block"
+                        aria-role="listitem"
+                        :disabled="block.name.includes('WIP')"
+                        >{{ block.name }}</b-dropdown-item
+                    >
+                </b-dropdown>
+            </b-field>
 
             <template v-if="block.type">
-                <div class="options mt-4">
-                    <component
-                        v-if="blockComponent"
-                        :is="blockComponent"
-                        :input="block.inputValues"
+                <b-field label="Block content">
+                    <BasicBlock
+                        class="mt-4"
+                        :block="block"
                         :edit="true"
+                        @submit="saveBlock"
                     />
-                </div>
+                </b-field>
             </template>
         </section>
         <footer class="modal-card-foot">
@@ -61,10 +68,12 @@
 <script>
 import { db } from '@/lib/db'
 import { allBlocks, getDefaultBlock, components } from '@/components/blocks'
+import BasicBlock from '@/components/blocks/BasicBlock.vue'
 
 export default {
     components: {
         ...components,
+        BasicBlock,
     },
     props: ['value', 'item', 'prefire', 'dashboardId'],
     data() {
@@ -79,6 +88,7 @@ export default {
         if (this.item) this.block = structuredClone(this.item)
     },
     mounted() {
+        console.log(this)
         if (this.prefire) {
             this.block.type =
                 allBlocks.find((item) => item.code == this.prefire) || this.block.type
@@ -120,10 +130,6 @@ export default {
         },
     },
     computed: {
-        blockComponent() {
-            const blockCode = this.block?.type?.code
-            return `${blockCode}Block`
-        },
         submitDisabled() {
             return !this.block.type
         },

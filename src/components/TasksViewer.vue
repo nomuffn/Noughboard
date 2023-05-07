@@ -124,7 +124,6 @@ export default {
             if (date - now > 0) {
                 now.setDate(now.getDate() - 1)
             }
-            console.log({now})
             return now
         },
         async toggleComplete(task) {
