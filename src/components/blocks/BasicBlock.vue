@@ -60,9 +60,11 @@ export default {
 .basicBlock {
     user-select: none;
 
-    &.hideScroll::-webkit-scrollbar {
-        display: none;
+    &.hideScroll {
         scrollbar-width: none;
+        &::-webkit-scrollbar {
+            display: none;
+        }
     }
 }
 </style>
