@@ -235,7 +235,7 @@ export default JSON.stringify({
                         type: { name: 'Lambda', code: 'lambda' },
                         inputValues: {
                             dailyResetTime: 1683410410540,
-                            lambda: 'const exampleDate = new Date()\n\nreturn `\n<p>Javascript code that is ran periodically.</p>\n<p>Could do whatever you need. Like fetching the lastest votes on your beatsaver maps for example :)))</p>\n</br>\n<p style=\\"font-weight: bold\\" >Date</p>\n<p>${exampleDate}</p>`',
+                            lambda: 'const exampleDate = new Date()\n\nreturn `\n<p>Javascript code that is ran periodically.</p>\n<p>Could do whatever you need. Like fetching the latest votes on your beatsaver maps for example :)))</p>\n</br>\n<p style=\\"font-weight: bold\\" >Date</p>\n<p>${exampleDate}</p>`',
                             repeat: 5,
                         },
                         dashboard: 1,

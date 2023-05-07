@@ -62,6 +62,7 @@ export default {
 
     &.hideScroll::-webkit-scrollbar {
         display: none;
+        scrollbar-width: none;
     }
 }
 </style>
