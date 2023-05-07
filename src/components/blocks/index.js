@@ -22,16 +22,16 @@ const allBlocks = [
         code: 'lambda',
     },
     {
+        name: 'Image',
+        code: 'image',
+    },
+    {
         name: 'Diary (WIP, like counter?)',
         code: 'diary',
     },
     {
         name: 'Bookmark (WIP)',
         code: 'bookmark',
-    },
-    {
-        name: 'Picture (WIP)',
-        code: 'picture',
     },
     {
         name: 'Reminder (WIP)',
