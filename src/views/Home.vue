@@ -96,6 +96,8 @@
     <div v-else>
         <p>Something went wrong while loading a dashboard.</p>
         <p>Try CTRL F5</p>
+        <p>If nothing works...</p>
+        <b-button label="reset and delete EVERYTHING? (on this site)" @click="reset" />
     </div>
 </template>
 
@@ -223,6 +225,13 @@ export default {
                 cancelText: 'pls dont',
                 confirmText: 'YES DELETE AND REPLACE EVERYTHING!!!',
             })
+        },
+        async reset() {
+            await db.tables.forEach(async (table) => {
+                await table.clear()
+            })
+            await db.import(new Blob([defaultData]))
+            window.history.go()
         },
     },
 }
