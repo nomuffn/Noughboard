@@ -1,8 +1,8 @@
 <template>
-    <div v-if="!edit">
+    <div class="imageBlock" v-if="!edit">
         <img :src="input.link" />
     </div>
-    <div v-else class="textBlock">
+    <div v-else class="imageBlock">
         <b-field label="Direct image link">
             <b-input v-model="input.link"></b-input>
         </b-field>
@@ -38,20 +38,7 @@ export default {
 </script>
 
 <style lang="scss">
-.textBlock {
-    p {
-        white-space: pre-line;
-        min-height: 1.5rem;
-    }
-
-    .quillWrapper {
-        button svg {
-            filter: invert(1);
-        }
-
-        .ql-picker-label {
-            color: #fff;
-        }
-    }
+.imageBlock {
+   
 }
 </style>
