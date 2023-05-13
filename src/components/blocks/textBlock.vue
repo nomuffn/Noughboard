@@ -56,7 +56,6 @@ export default {
 <style lang="scss">
 .textBlock {
     p {
-        white-space: pre-line;
         min-height: 1.5rem;
     }
 
