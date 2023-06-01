@@ -4,28 +4,24 @@
             <p class="modal-card-title">New Task for '{{ category }}'</p>
         </header>
         <section class="modal-card-body">
-            <b-field label="Task">
-                <b-input v-model="task.content"></b-input>
-            </b-field>
-            <b-field label="Details">
-                <b-input v-model="task.details" type="textarea"></b-input>
-            </b-field>
+            <InputText label="Task" v-model="task.content"></InputText>
+            <InputText label="Details" v-model="task.details" textarea></InputText>
+            <Dropdown v-model="task.color" :options="colors" optionLabel="name" appendTo="body" />
 
             <!-- <b-field label="Priority">
                 <b-numberinput v-model="task.priority"></b-numberinput>
             </b-field> -->
         </section>
         <footer class="modal-card-foot justify-end">
-            <b-button
+            <Button
                 :label="deleteSure ? 'Sure?' : 'Delete'"
-                type="is-danger"
-                class="mr-auto"
+                class="mr-auto p-button-danger"
                 v-if="task.id"
                 @click="deleteTask()"
             />
 
-            <b-button label="Close" @click="$emit('close')" />
-            <b-button
+            <Button label="Close" class="ml-auto mr-2" @click="$emit('close')" />
+            <Button
                 label="Save"
                 @click="saveTask"
                 :disabled="submitDisabled"
@@ -54,6 +50,36 @@ export default {
                 details: '',
             },
             deleteSure: false,
+            colors: [
+                {
+                    name: 'none',
+                    hex: null,
+                },
+                {
+                    name: 'green',
+                    hex: '#00C853',
+                },
+                {
+                    name: 'yellow',
+                    hex: '#FFD600',
+                },
+                {
+                    name: 'red',
+                    hex: '#DD2C00',
+                },
+                {
+                    name: 'white',
+                    hex: '#fff',
+                },
+                {
+                    name: 'blue',
+                    hex: '#0091EA',
+                },
+                {
+                    name: 'black',
+                    hex: '#000',
+                },
+            ],
         }
     },
     mounted() {
@@ -63,6 +89,7 @@ export default {
     },
     methods: {
         async saveTask() {
+            if (!this.task.color?.hex) this.task.color = null
             await db.tasks.put({
                 category: this.category.toLowerCase(),
                 ...this.task,
@@ -86,15 +113,4 @@ export default {
 }
 </script>
 
-<style lang="scss">
-.editBlockModal {
-    .modal-card-body {
-        min-height: 25vh;
-        min-width: 50vh;
-        height: auto;
-    }
-    .modal-card-foot {
-        justify-content: flex-end;
-    }
-}
-</style>
+<style lang="scss"></style>

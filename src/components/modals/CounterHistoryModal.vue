@@ -5,12 +5,7 @@
         </header>
         <section class="modal-card-body">
             <div class="flex items-center justify-between">
-                <b-button
-                    class="m-1"
-                    type="is-primary"
-                    icon-right="arrow-left"
-                    @click="loadValues()"
-                />
+                <Button class="m-1" icon="pi pi-angle-left" @click="loadValues()" />
                 <p>
                     <!-- geil -->
                     {{
@@ -21,12 +16,7 @@
                     -
                     {{ date.toLocaleDateString() }}
                 </p>
-                <b-button
-                    class="m-1"
-                    type="is-primary"
-                    icon-right="arrow-right"
-                    @click="loadValues(false)"
-                />
+                <Button icon="pi pi-angle-right" @click="loadValues(false)" />
             </div>
             <div>
                 <p v-for="value in values" :key="value">
@@ -35,7 +25,7 @@
             </div>
         </section>
         <footer class="modal-card-foot">
-            <b-button label="Close" @click="$emit('close')" />
+            <Button label="Close" @click="$emit('close')" />
         </footer>
     </div>
 </template>
@@ -101,15 +91,4 @@ export default {
 }
 </script>
 
-<style lang="scss">
-.editBlockModal {
-    .modal-card-body {
-        min-height: 25vh;
-        min-width: 50vh;
-        height: auto;
-    }
-    .modal-card-foot {
-        justify-content: flex-end;
-    }
-}
-</style>
+<style lang="scss"></style>

@@ -1,6 +1,6 @@
 <template>
-    <div class="bg-slate-900">
-        <div id="app" class="bg-slate-900">
+    <div>
+        <div id="app">
             <router-view />
         </div>
     </div>

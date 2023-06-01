@@ -6,31 +6,12 @@
             </p>
         </header>
         <section class="modal-card-body">
-            <b-field label="Block type">
-                <b-dropdown
-                    v-model="block.type"
-                    aria-role="list"
-                    :scrollable="true"
-                    :max-height="500"
-                >
-                    <template #trigger="{ active }">
-                        <b-button
-                            :label="block.type.name"
-                            type="is-primary"
-                            :icon-right="active ? 'menu-up' : 'menu-down'"
-                        />
-                    </template>
 
-                    <b-dropdown-item
-                        v-for="block in allBlocks"
-                        :key="block.code"
-                        :value="block"
-                        aria-role="listitem"
-                        :disabled="block.name.includes('WIP')"
-                        >{{ block.name }}</b-dropdown-item
-                    >
-                </b-dropdown>
-            </b-field>
+            <Dropdown
+                v-model="block.type"
+                :options="allBlocks"
+                optionLabel="name"
+            />
 
             <template v-if="block.type">
                 <BasicBlock
@@ -42,22 +23,35 @@
             </template>
         </section>
         <footer class="modal-card-foot justify-end">
-            <b-button disabled label="Archive" type="is-warning" v-if="block.id" />
-            <b-button
-                :label="deleteSure ? 'Sure?' : 'Delete'"
-                type="is-danger"
-                class="mr-auto"
+            <Button
                 v-if="block.id"
+                label="Archive"
+                class="p-button-warning"
+                disabled
+            />
+            <Button
+                v-if="block.id"
+                :label="deleteSure ? 'Sure?' : 'Delete'"
+                class="p-button-danger mx-2 mr-auto"
                 @click="deleteBlock()"
             />
-            <b-button disabled label="Import" />
-            <b-button disabled label="Export" />
-            <b-button label="Close" @click="$emit('close')" />
-            <b-button
+
+            <!-- TODO 
+            <Button disabled label="Import" />
+            <Button disabled label="Export" />
+            <Button disabled label="Copy" />
+            <Button disabled label="Move" />
+             -->
+
+            <Button
+                label="Close"
+                class="mx-2 ml-auto p-button-secondary"
+                @click="$emit('close')"
+            />
+            <Button
                 label="Save"
                 @click="saveBlock()"
                 :disabled="submitDisabled"
-                type="is-primary"
             />
         </footer>
     </div>
@@ -73,7 +67,7 @@ export default {
         ...components,
         BasicBlock,
     },
-    props: ['value', 'item', 'prefire', 'dashboardId'],
+    props: ['value', 'item', 'prefire', 'dashboardId', 'treeNodeKey'],
     data() {
         return {
             allBlocks: allBlocks,
@@ -112,6 +106,9 @@ export default {
                     h: 4,
                     i: length + 1,
                 }
+            }
+            if (this.treeNodeKey) {
+                block.treeNode = this.treeNodeKey
             }
             await db.blocks.put(block).then(async (id) => {
                 block.i = block.id

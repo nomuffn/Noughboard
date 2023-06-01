@@ -9,10 +9,8 @@
         <!-- 
             full page would require to emit a new event back to Blockswrapper and/or Home. In there you need to reopen the modal in fullscreen. Reutizilize the prefire var to also save the block options & inputvalues and reload the modal in fullscreen with previous values
          -->
-        <b-checkbox v-model="input.fullPage" :disabled="true">
-            Use full page (WIP)
-        </b-checkbox>
-        <VueEditor class="my-2" ref="editor" v-model="input.text" />
+        <Checkbox v-model="input.fullPage" label="Use full page (WIP)" :disabled="true"/>
+        <Editor v-model="input.text" ref="editor" class="my-2" editorStyle="height: 320px"/>
         <div class="opacity-50">
             <p>Save: ctrl + s</p>
             <p>Undo: ctrl + z</p>
@@ -21,10 +19,7 @@
 </template>
 
 <script>
-import { VueEditor } from 'vue2-editor'
-
 export default {
-    components: { VueEditor },
     mounted() {
         if (this.edit) {
             setTimeout(() => {

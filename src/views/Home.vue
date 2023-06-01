@@ -1,16 +1,21 @@
 <template>
-    <div v-if="dashboard" class="home flex flex-col">
+    <div v-if="selectedDashboard" class="home flex flex-col">
         <div class="flex self-center items-center">
-            <b-button
-                class="m-3"
-                type="is-text"
-                icon-right="arrow-left"
-                :disabled="currentDashboard <= 0"
-                @click="currentDashboard--"
+            <Button
+                icon="pi pi-angle-left"
+                class="m-3 p-button-text"
+                @click="selectDashboard(false)"
             />
-            <b-dropdown
-                v-model="currentDashboard"
-                :triggers="['hover']"
+
+            <Dropdown
+                class="dashboard-selector"
+                v-model="selectedDashboard"
+                :options="dashboards"
+                optionLabel="title"
+            />
+
+            <!-- <b-dropdown
+                v-model="selectedDashboard"
                 :scrollable="true"
                 :max-height="250"
                 aria-role="list"
@@ -32,7 +37,7 @@
                     <div class="flex items-center">
                         <b-icon :icon="item.icon || 'home'"></b-icon>
                         <p class="mx-4 text-lg font-bold">{{ item.title }}</p>
-                        <b-button
+                        <Button
                             class="ml-auto"
                             type="is-text"
                             icon-right="pencil"
@@ -41,63 +46,81 @@
                     </div>
                 </b-dropdown-item>
                 <div class="flex justify-center">
-                    <b-button
+                    <Button
                         @click="editDashboard(true)"
                         type="is-text"
                         icon-right="plus"
                     />
                 </div>
-            </b-dropdown>
+            </b-dropdown> -->
+
             <!-- <div class="flex items-center p-3 rounded-md bg-slate-700">
             </div> -->
-            <b-button
-                class="m-3"
-                type="is-text"
-                icon-right="arrow-right"
-                :disabled="currentDashboard >= dashboards.length - 1"
-                @click="currentDashboard++"
+            <Button
+                icon="pi pi-angle-right"
+                class="m-3 p-button-text"
+                @click="selectDashboard()"
             />
         </div>
-        <div class="flex mt-3 mx-4 p-3 rounded-md bg-slate-800 max-w-50 self-center">
-            <b-tooltip label="Add block" type="is-dark">
-                <b-button
-                    class="m-3"
-                    type="is-primary"
-                    icon-right="plus"
-                    size="is-medium"
-                    @click="addBlock"
-                />
-            </b-tooltip>
-
-            <b-tooltip label="Export all data" type="is-dark">
-                <b-button
-                    class="m-3"
-                    type="is-primary"
-                    icon-right="export-variant"
-                    size="is-medium"
-                    @click="exportDb"
-                />
-            </b-tooltip>
-
-            <b-tooltip label="Import all data" type="is-dark">
-                <b-button
-                    class="m-3"
-                    type="is-primary"
-                    icon-right="import"
-                    size="is-medium"
-                    @click="importDb"
-                />
-            </b-tooltip>
+        <div class="buttons flex mt-3 mx-4 p-3 rounded-md max-w-50 self-center">
+            <Button class="m-3" icon="pi pi-plus" @click="addBlock" />
+            <Button class="m-3" icon="pi pi-file-export" @click="exportDb" />
+            <Button class="m-3" icon="pi pi-file-import" @click="importDb" />
+            <Button class="m-3" icon="pi pi-cog" @click="editDashboard(false)" />
         </div>
 
-        <BlocksWrapper :dashboard="dashboard" :blocks="blocks" @update="loadBlocks()" />
-        <!-- <EditBlockModal v-model="showEditModal" @update="loadBlocks()" /> -->
+        <div class="flex">
+            <div
+                class="tree flex flex-col"
+                v-if="selectedDashboard.useTree && selectedDashboard.tree"
+            >
+                <Tree
+                    :value="selectedDashboard.tree"
+                    selectionMode="single"
+                    :selectionKeys.sync="selectedTreeNode"
+                    :expandedKeys="selectedDashboard.treeExpandedKeys"
+                    @node-expand="saveDashboard"
+                    @node-collapse="saveDashboard"
+                    @node-select="saveDashboard"
+                >
+                    <template #default="slotProps">
+                        <div
+                            class="flex items-center"
+                            :style="
+                                slotProps.node.children == 0
+                                    ? 'margin-left: -35px'
+                                    : 'margin-left: -15px'
+                            "
+                        >
+                            <b class="mr-2 mb-1">{{ slotProps.node.label }}</b>
+                            <Button
+                                class="ml-auto p-button-text p-button-secondary"
+                                icon="pi pi-cog"
+                                @click.stop="editTreeNode(slotProps.node)"
+                            />
+                        </div>
+                    </template>
+                </Tree>
+                <Button
+                    class="self-center p-button-text"
+                    icon="pi pi-plus"
+                    @click.stop="editTreeNode()"
+                />
+            </div>
+
+            <BlocksWrapper
+                class="flex-1"
+                :dashboard="selectedDashboard"
+                :blocks="blocks"
+                @update="loadDashboard()"
+            />
+        </div>
     </div>
     <div v-else>
         <p>Something went wrong while loading a dashboard.</p>
         <p>Try CTRL F5</p>
         <p>If nothing works...</p>
-        <b-button label="reset and delete EVERYTHING? (on this site)" @click="reset" />
+        <Button label="reset and delete EVERYTHING? (on this site)" @click="reset" />
     </div>
 </template>
 
@@ -109,6 +132,7 @@ import twitch from '@/lib/twitch'
 
 import EditBlockModal from '@/components/modals/EditBlockModal.vue'
 import EditDashboard from '@/components/modals/EditDashboard.vue'
+import EditTreeNode from '@/components/modals/EditTreeNode.vue'
 
 import defaultData from '@/lib/defaultData'
 
@@ -119,23 +143,25 @@ export default {
             // cant use live query, it would loop the saves, can probably be throttled but this is fine for now. dont need livequeries
             blocks: [],
             dashboards: null,
-            currentDashboard: 0,
-            currentMenu: null,
+            selectedDashboard: null,
         }
     },
-    computed: {
-        dashboard() {
-            if (!this.dashboards?.length) return null
-            return this.dashboards[this.currentDashboard]
+    watch: {
+        selectedDashboard(newval, oldval) {
+            console.log('watch selectedDashboard')
+            this.loadDashboard()
+        },
+        selectedTreeNode(newval, oldval) {
+            console.log('watch selectedTreeNode')
+            this.loadDashboard()
         },
     },
-    watch: {
-        dashboard(newval, oldval) {
-            this.loadBlocks()
-        },
+    async created() {
+        await import(`@/assets/themes/bootstrap4-dark-blue/theme.css`)
     },
     async mounted() {
         await this.loadDashboards()
+        await this.loadDashboard()
         // this.$toast.open({
         //     duration: 5000,
         //     message: `danger toast test, Something's not good, also I'm on <b>bottom</b>`,
@@ -150,7 +176,56 @@ export default {
 
         twitch.handleToken()
     },
+    computed: {
+        dashboardIndex() {
+            return this.selectedDashboard
+                ? this.dashboards.findIndex(
+                      (item) => item.id == this.selectedDashboard.id,
+                  )
+                : 0
+        },
+        selectedTreeNode: {
+            get() {
+                if (this.selectedDashboard?.useTree)
+                    return (
+                        this.selectedDashboard?.selectedTreeNode ||
+                        this.selectedDashboard.tree[0].key
+                    )
+                return null
+            },
+            set(val) {
+                this.selectedDashboard.selectedTreeNode = val
+            },
+        },
+    },
     methods: {
+        async saveDashboard() {
+            console.log('saveDashboard')
+            await db.dashboards.put(this.selectedDashboard)
+        },
+        editTreeNode(treeNode) {
+            this.$buefy.modal.open({
+                parent: this,
+                component: EditTreeNode,
+                hasModalCard: true,
+                trapFocus: true,
+                props: { treeNode },
+                events: {
+                    create: async (newNode) => {
+                        if (treeNode) {
+                            treeNode.children.push(newNode)
+                        } else {
+                            this.selectedDashboard.tree.push(newNode)
+                        }
+                        await this.saveDashboard()
+                    },
+                    update: async (newNode) => {
+                        treeNode.label = newNode.label
+                        await this.saveDashboard()
+                    },
+                },
+            })
+        },
         async loadDashboards() {
             this.dashboards = await db.dashboards.toArray()
 
@@ -158,8 +233,19 @@ export default {
                 await db.import(new Blob([defaultData]))
                 return this.loadDashboards()
             }
+
+            this.selectedDashboard = this.dashboards[this.dashboardIndex]
         },
-        async editDashboard(neww = false, index = this.currentDashboard) {
+        selectDashboard(forward = true) {
+            const index = this.dashboardIndex
+            let newIndex = index + (forward ? 1 : -1)
+            if (newIndex >= this.dashboards.length) newIndex = 0
+            else if (newIndex < 0) newIndex = this.dashboards.length - 1
+
+            this.selectedDashboard = this.dashboards[newIndex]
+            this.loadDashboard(true)
+        },
+        async editDashboard(neww = false, index = this.dashboardIndex) {
             this.$buefy.modal.open({
                 parent: this,
                 component: EditDashboard,
@@ -169,8 +255,10 @@ export default {
                 events: {
                     close: async () => {
                         await this.loadDashboards()
-                        if (neww || this.currentDashboard >= this.dashboards.length) {
-                            this.currentDashboard = this.dashboards.length - 1
+                        if (neww || this.selectedDashboard >= this.dashboards.length) {
+                            this.selectedDashboard = this.dashboards.length - 1
+                        } else {
+                            this.selectedDashboard = this.dashboards[this.dashboardIndex]
                         }
                     },
                 },
@@ -182,20 +270,66 @@ export default {
                 component: EditBlockModal,
                 hasModalCard: true,
                 trapFocus: true,
-                props: { prefire, dashboardId: this.dashboard.id },
+                props: {
+                    prefire,
+                    dashboardId: this.selectedDashboard.id,
+                    treeNodeKey: this.selectedDashboard.useTree
+                        ? Object.keys(this.selectedTreeNode)[0]
+                        : null,
+                },
                 events: {
                     close: () => {
-                        this.loadBlocks()
+                        this.loadDashboard()
                     },
                 },
             })
         },
-        async loadBlocks() {
-            console.log('loadblocks')
+        async loadDashboard(switched = false) {
+            console.log('loadDashboard')
+            // might loop with watcher
+            this.selectedDashboard = this.dashboards[this.dashboardIndex]
+
+            if (this.selectedDashboard.useTree) {
+                if (!this.selectedDashboard.tree) {
+                    await db.dashboards.put({
+                        ...this.selectedDashboard,
+                        treeExpandedKeys: {},
+                        tree: [
+                            {
+                                key: 'start',
+                                label: 'Start',
+                                children: [],
+                            },
+                        ],
+                    })
+                    return await this.loadDashboards()
+                }
+            }
+
             this.blocks = [] // dont reuse components
-            this.blocks = await db.blocks
-                .filter((block) => block.dashboard == this.dashboard.id)
-                .toArray()
+            let blocks = await db.blocks.filter(
+                (block) => block.dashboard == this.selectedDashboard.id,
+            )
+
+            if (this.selectedDashboard.useTree) {
+                const firstTreeNodeKey = this.selectedDashboard.tree[0].key
+
+                if (!this.selectedTreeNode || switched) {
+                    this.selectedTreeNode = { [firstTreeNodeKey]: true }
+                }
+
+                const selectedTreeNodeKey = Object.keys(this.selectedTreeNode)[0]
+                blocks = blocks.filter((block) => {
+                    return (
+                        block.treeNode == selectedTreeNodeKey ||
+                        (firstTreeNodeKey == selectedTreeNodeKey
+                            ? !block.treeNode
+                            : false)
+                    )
+                })
+            }
+
+            this.blocks = await blocks.toArray()
         },
         async exportDb() {
             let dbBlob = await db.export()
@@ -220,7 +354,7 @@ export default {
                         await table.clear()
                     })
                     await db.import(new Blob([json]))
-                    this.loadBlocks()
+                    this.loadDashboards()
                 },
                 cancelText: 'pls dont',
                 confirmText: 'YES DELETE AND REPLACE EVERYTHING!!!',
@@ -236,8 +370,23 @@ export default {
     },
 }
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
+// @import '@/assets/themes/bootstrap4-dark-blue/theme.css';
+
+@import 'primevue/resources/primevue.min.css';
+@import 'primeicons/primeicons.css';
+
+.buttons {
+    background-color: var(--surface-a);
+}
+
 .dropdown-menu {
     min-width: 0 !important;
+}
+
+.p-tree {
+    border: none;
+    padding: 0;
+    margin-right: 20px;
 }
 </style>

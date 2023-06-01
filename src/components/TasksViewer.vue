@@ -11,14 +11,14 @@
                     v-for="task in mutableTasks"
                     :key="task.id"
                     class="flex justify-between items-center mb-1"
+                    :style="getStyle(task)"
                 >
                     <div>
-                        <b-checkbox
+                        <Checkbox
                             v-model="states[task.id]"
                             @input="toggleComplete(task)"
-                        >
-                            {{ task.content }}
-                        </b-checkbox>
+                            :label="task.content"
+                        />
                         <p
                             v-if="task.details"
                             style="
@@ -33,9 +33,9 @@
                     </div>
 
                     <div class="actions flex">
-                        <b-button
-                            type="is-text"
-                            icon-right="pencil"
+                        <Button
+                            class="p-button-text"
+                            icon="pi pi-pencil"
                             @click="editTask(task)"
                         />
                     </div>
@@ -86,6 +86,12 @@ export default {
         },
     },
     methods: {
+        getStyle(task) {
+            if (task.color) {
+                return `border-left: 5px; border-color: ${task.color.hex}; border-style: solid; padding-left: 10px;`
+            }
+            return ''
+        },
         async updateTasks() {
             // await db.tasks.put({ ...item.moved.element, index: item.moved.newIndex })
             await db.tasks.bulkPut(

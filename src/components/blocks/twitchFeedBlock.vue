@@ -39,11 +39,11 @@
     </div>
     <div v-else>
         <div v-if="!twitchAuthenticated">
-            <b-button @click="loginTwitch">Login to twitch</b-button>
+            <Button @click="loginTwitch">Login to twitch</Button>
         </div>
-        <b-field class="mt-2" label="Add streamer by pressing enter">
+        <p class="mt-2" label="Add streamer by pressing enter">
             <ListInput v-model="editStreamers" />
-        </b-field>
+        </p>
     </div>
 </template>
 

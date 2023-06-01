@@ -3,9 +3,7 @@
         <img :src="input.link" />
     </div>
     <div v-else class="imageBlock">
-        <b-field label="Direct image link">
-            <b-input v-model="input.link"></b-input>
-        </b-field>
+        <InputText v-model="input.link" label="Direct image link"></InputText>
     </div>
 </template>
 

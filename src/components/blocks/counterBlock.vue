@@ -8,37 +8,17 @@
                 <p>Count: {{ count }}</p>
             </div>
             <div>
-                <b-button
-                    class="mx-1"
-                    type="is-primary"
-                    icon-right="plus"
-                    @click="add()"
-                />
-                <b-button
-                    class="mx-1"
-                    type="is-primary"
-                    icon-right="minus"
-                    @click="add(-1)"
-                />
-                <b-button
-                    class="mx-1"
-                    type="is-primary"
-                    icon-right="history"
-                    @click="history"
-                />
+                <Button class="mx-1" icon="pi pi-plus" @click="add()" />
+                <Button class="mx-1" icon="pi pi-minus" @click="add(-1)" />
+                <Button class="mx-1" icon="pi pi-history" @click="history" />
             </div>
         </div>
     </div>
     <div v-else class="counterBlock">
         <p class="mb-2">Resets every day</p>
-        <b-field label="Title">
-            <b-input v-model="input.title"></b-input>
-            <!-- <b-input v-model="input.description" type="textarea"></b-input> -->
-        </b-field>
-        <b-field label="Unique identifier for database">
-            <b-input v-model="input.key"></b-input>
-            <!-- <b-input v-model="input.description" type="textarea"></b-input> -->
-        </b-field>
+
+        <InputText label="Title" v-model="input.title"></InputText>
+        <InputText label="Unique identifier for database" v-model="input.key"></InputText>
     </div>
 </template>
 

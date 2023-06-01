@@ -3,7 +3,7 @@
         :class="[
             'basicBlock',
             !edit && 'rounded-md h-full w-full overflow-auto',
-            !edit && !block.transparent && 'bg-slate-800',
+            !edit && !block.transparent && 'bg',
             !edit && !block.showScroll && 'hideScroll',
             !edit && block.type.code != 'image' && !block.noPadding && 'p-4',
         ]"
@@ -16,16 +16,15 @@
         />
 
         <div v-if="edit" class="mt-4">
-            <b-field label="Extra options">
-                <b-checkbox v-model="block.transparent">
-                    Transparent background
-                </b-checkbox>
-                <b-checkbox v-model="block.hideResizeHandle">
-                    Hide resize handle
-                </b-checkbox>
-                <b-checkbox v-model="block.showScroll"> Show scrollbar </b-checkbox>
-                <b-checkbox v-model="block.noPadding"> No padding </b-checkbox>
-            </b-field>
+            <p>Extra options</p>
+
+            <div class="flex">
+                <Checkbox v-model="block.transparent" label="Transparent background" />
+                <Checkbox v-model="block.hideResizeHandle" label="Hide resize handle">
+                </Checkbox>
+                <Checkbox v-model="block.showScroll" label="Show scrollbar"> </Checkbox>
+                <Checkbox v-model="block.noPadding" label="No padding"> </Checkbox>
+            </div>
         </div>
     </div>
 </template>

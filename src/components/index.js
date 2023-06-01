@@ -5,6 +5,8 @@ function asyncComponent(path, name = null) {
     Vue.component(name, () => import(`@/components/${path}.vue`))
 }
 
+asyncComponent('basic/Checkbox')
+asyncComponent('basic/InputText')
 asyncComponent('modals/EditBlockModal')
 asyncComponent('modals/NewTaskModal')
 asyncComponent('BlocksWrapper')

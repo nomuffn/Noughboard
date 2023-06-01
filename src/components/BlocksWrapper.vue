@@ -68,6 +68,7 @@ export default {
     },
     methods: {
         layoutUpdatedEvent() {
+            console.log("layoutUpdatedEvent")
             db.blocks.bulkPut(this.blocks)
         },
         editBlock(item) {

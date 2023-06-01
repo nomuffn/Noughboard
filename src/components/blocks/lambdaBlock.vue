@@ -1,7 +1,7 @@
 <template>
     <div class="lambdaBlock">
         <div class="view" v-if="!edit">
-            <b-loading v-if="loading" v-model="loading" />
+            <ProgressSpinner v-if="loading" />
             <div class="result" v-else-if="result">
                 <p class="remaining" v-if="input.repeat > 0">~{{ getRemainingTime }}</p>
                 <div class="my-2 result-html" v-html="result"></div>
@@ -15,16 +15,16 @@
             <p>Code is ran on page load</p>
             <p>After it can be ran ever X minutes</p>
             <p>0 means never</p>
-            <b-numberinput
-                class="my-2"
+            <InputNumber
                 v-model="input.repeat"
-                id="minmax-buttons"
-                min="0"
-                ax="100"
+                class="my-2"
+                :min="0"
+                :max="100"
+                showButtons 
             />
 
             <ScriptEditor v-model="inputLambda" class="my-2" />
-            <b-button
+            <Button
                 class="my-2"
                 label="Test run code"
                 icon-right="check"

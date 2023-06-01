@@ -1,5 +1,5 @@
 <template>
-    <div class="newTaskModal modal-card" style="width: auto; min-width: 400px">
+    <div class="doneTasksModal modal-card" style="width: auto; min-width: 400px">
         <header class="modal-card-head">
             <p class="modal-card-title">Done'd tasks for '{{ category }}'</p>
         </header>
@@ -7,7 +7,7 @@
             <TasksViewer v-if="tasks.length" :tasks="tasks" :archive="true" />
         </section>
         <footer class="modal-card-foot">
-            <b-button label="Close" @click="$emit('close')" />
+            <Button label="Close" @click="$emit('close')" />
         </footer>
     </div>
 </template>
@@ -45,14 +45,5 @@ export default {
 </script>
 
 <style lang="scss">
-.editBlockModal {
-    .modal-card-body {
-        min-height: 25vh;
-        min-width: 50vh;
-        height: auto;
-    }
-    .modal-card-foot {
-        justify-content: flex-end;
-    }
-}
+
 </style>

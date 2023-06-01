@@ -263,7 +263,7 @@ export default JSON.stringify({
                     },
                     {
                         category: 'todos',
-                        content: 'Clean apartment (lohl)',
+                        content: 'Cleaning (lohl)',
                         details: 'the task that will never be completed',
                         id: 29,
                         index: 1,
@@ -284,7 +284,7 @@ export default JSON.stringify({
                     },
                     {
                         category: 'daily repeating tasks',
-                        content: 'Clean the fucking kitchen',
+                        content: 'Clean the kitchen',
                         details: '',
                         id: 32,
                     },

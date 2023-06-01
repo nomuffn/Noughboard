@@ -3,20 +3,20 @@
         <div class="flex justify-between items-center">
             <strong>{{ input.category }}</strong>
             <div class="actions flex">
-                <b-button
+                <Button
                     v-if="input.daily"
-                    icon-right="history"
-                    type="is-text"
+                    class="p-button-text"
+                    icon="pi pi-history"
                     @click="openHistory()"
                     :disabled="true"
                 />
-                <b-button
+                <Button
                     v-if="!input.daily"
-                    icon-right="archive"
-                    type="is-text"
+                    class="p-button-text"
+                    icon="pi pi-folder"
                     @click="openArchive()"
                 />
-                <b-button icon-right="plus" type="is-text" @click="newTask()" />
+                <Button class="p-button-text" icon="pi pi-plus" @click="newTask()" />
             </div>
         </div>
         <TasksViewer
@@ -29,20 +29,18 @@
         <p v-if="input.daily">Resets in {{ dailyResetTimeLeft }}</p>
     </div>
     <div v-else>
-        <b-field label="Category (also the identifier in the database rn)">
-            <b-input v-model="input.category"></b-input>
-        </b-field>
-        <b-field label="Daily Tasks">
-            <b-checkbox v-model="input.daily"> Active </b-checkbox>
-        </b-field>
+        <InputText
+            v-model="input.category"
+            label="Category (also the identifier in the database rn)"
+        ></InputText>
+        <Checkbox v-model="input.daily" label="Daily Tasks"> Active </Checkbox>
         <div v-if="input.daily">
-            <b-field label="Reset at">
-                <b-timepicker
-                    v-model="input.dailyResetTime"
-                    inline
-                    placeholder="Click to select..."
-                />
-            </b-field>
+            <p>Reset at</p>
+            <b-timepicker
+                v-model="input.dailyResetTime"
+                inline
+                placeholder="Click to select..."
+            />
         </div>
     </div>
 </template>

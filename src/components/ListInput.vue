@@ -1,20 +1,15 @@
 <template>
     <div id="list-input">
-        <b-input v-model="input" id="new-item" @keyup.enter.native="add" />
+        <InputText label="Press enter to add streamer" v-model="input" id="new-item" @keyup.enter.native="add" />
         <ul class="my-1">
             <li
                 v-for="(valueInput, index) in value"
                 :key="index"
-                class="flex items-center my-2"
+                class="flex items-center my-1"
             >
                 <p>-</p>
-                <b-button
-                    class="ml-2"
-                    type="is-primary"
-                    icon-right="close"
-                    @click="remove(index)"
-                />
                 <p class="ml-2">{{ valueInput }}</p>
+                <Button class="ml-2 p-button-text" icon="pi pi-trash" @click="remove(index)" />
             </li>
         </ul>
     </div>

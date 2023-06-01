@@ -6,18 +6,22 @@
             </p>
         </header>
         <section class="modal-card-body">
-            <b-field label="Title">
-                <b-input v-model="dashboardData.title"></b-input>
-            </b-field>
-            <b-field label="Icon key (https://pictogrammers.com/library/mdi/)">
-                <b-input v-model="dashboardData.icon"></b-input>
-            </b-field>
-            <b-checkbox v-model="dashboardData.verticalCompact"
-                >Vertically compact</b-checkbox
-            >
+            <InputText label="Title" v-model="dashboardData.title"></InputText>
+            <InputText
+                label="Icon key (https://pictogrammers.com/library/mdi/)"
+                v-model="dashboardData.icon"
+            ></InputText>
+            <Checkbox
+                label="Vertically compact"
+                v-model="dashboardData.verticalCompact"
+            />
+            <Checkbox
+                label="Enable tree"
+                v-model="dashboardData.useTree"
+            />
         </section>
         <footer class="modal-card-foot">
-            <b-button
+            <Button
                 v-if="isNew"
                 :label="deleteSure ? 'Sure?' : 'Delete'"
                 class="mr-auto"
@@ -25,12 +29,12 @@
                 @click="deleteDb"
             />
 
-            <b-button label="Close" @click="$emit('close')" />
-            <b-button
+            <Button label="Close" class="ml-auto" @click="$emit('close')" />
+            <Button
                 label="Save"
+                class="ml-2"
                 @click="save"
                 :disabled="submitDisabled"
-                type="is-primary"
             />
         </footer>
     </div>
@@ -79,15 +83,4 @@ export default {
 }
 </script>
 
-<style lang="scss">
-.editBlockModal {
-    .modal-card-body {
-        min-height: 25vh;
-        min-width: 50vh;
-        height: auto;
-    }
-    .modal-card-foot {
-        justify-content: flex-end;
-    }
-}
-</style>
+<style lang="scss"></style>

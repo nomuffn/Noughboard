@@ -5,12 +5,12 @@
         </header>
         <section class="modal-card-body">
             <b-field label="Task">
-                <b-input v-model="dashboard.title"></b-input>
+                <InputText v-model="dashboard.title"></InputText>
             </b-field>
         </section>
         <footer class="modal-card-foot">
-            <b-button label="Close" @click="$emit('close')" />
-            <b-button
+            <Button label="Close" @click="$emit('close')" />
+            <Button
                 label="Save"
                 @click="save"
                 :disabled="submitDisabled"
