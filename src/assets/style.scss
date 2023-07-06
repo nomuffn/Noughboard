@@ -70,22 +70,4 @@ strong {
 
 .dashboard-selector.p-dropdown {
     background-color: var(--surface-a);
-
-    .p-dropdown-label.p-inputtext {
-        font-size: 1.5rem;
-        font-weight: bold;
-    }
-}
-
-.p-tree.p-component {
-    padding: 0;
-    border: none;
-    background: none;
-    // .p-treenode-content {
-    //     padding-right: 30px !important;
-    // }
-
-    .p-treenode-label {
-        width: 100%;
-    }
 }

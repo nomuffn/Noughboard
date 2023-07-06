@@ -25,7 +25,7 @@
             :class="[item.hideResizeHandle && 'hideResizeHandle']"
         >
             <div class="w-full h-full" @contextmenu.prevent="() => editBlock(item)">
-                <BasicBlock :block="item" />
+                <BasicBlock :block="item" :decryptionPass="$attrs.decryptionPass" />
             </div>
         </grid-item>
     </grid-layout>
@@ -68,7 +68,7 @@ export default {
     },
     methods: {
         layoutUpdatedEvent() {
-            console.log("layoutUpdatedEvent")
+            console.log('layoutUpdatedEvent')
             db.blocks.bulkPut(this.blocks)
         },
         editBlock(item) {
@@ -78,7 +78,10 @@ export default {
                 hasModalCard: true,
                 trapFocus: true,
                 fullScreen: false,
-                props: { item, dashboardId: this.dashboard.id },
+                props: { 
+                    item, dashboardId: this.dashboard.id, 
+                    decryptionPass: this.$attrs.decryptionPass
+                 },
                 events: {
                     close: () => {
                         this.$emit('update')

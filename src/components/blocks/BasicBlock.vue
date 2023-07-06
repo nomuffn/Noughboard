@@ -9,9 +9,10 @@
         ]"
     >
         <component
+            :class="[!edit && block.blur && 'blur']"
             :edit="edit"
             :is="getBlock()"
-            :input="block.inputValues"
+            :input="getInputValues()"
             @submit="$emit('submit')"
         />
 
@@ -24,6 +25,7 @@
                 </Checkbox>
                 <Checkbox v-model="block.showScroll" label="Show scrollbar"> </Checkbox>
                 <Checkbox v-model="block.noPadding" label="No padding"> </Checkbox>
+                <Checkbox v-model="block.blur" label="Blur"> </Checkbox>
             </div>
         </div>
     </div>
@@ -31,6 +33,7 @@
 
 <script>
 import { allBlocks, components } from '@/components/blocks'
+import CryptoJS from 'crypto-js'
 
 export default {
     components: {
@@ -47,6 +50,24 @@ export default {
         },
     },
     methods: {
+        decrypt(value) {
+            console.log({ value })
+            var bytes = CryptoJS.AES.decrypt(value, this.$attrs.decryptionPass)
+            console.log({ bytes })
+            var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8))
+            console.log({ decryptedData })
+            return decryptedData
+        },
+        getInputValues() {
+            let values
+            if (this.$attrs.decryptionPass) {
+                values = this.decrypt(this.block.inputValues)
+            } else {
+                values = this.block.inputValues
+            }
+            console.log({ values })
+            return values
+        },
         getBlock() {
             const blockCode = this.block?.type?.code
             return `${blockCode}Block`
@@ -63,6 +84,12 @@ export default {
         scrollbar-width: none;
         &::-webkit-scrollbar {
             display: none;
+        }
+    }
+
+    > div.blur {
+        &:hover {
+            filter: blur(0);
         }
     }
 }

@@ -7,14 +7,21 @@
             <div v-if="!streamers.length">
                 <p>No streamers live :(</p>
             </div>
-            <div v-else>
-                <div v-for="streamer in streamers" :key="streamer.id" class="my-2">
+            <div v-else :class="[input.horizontal && 'horizontal']">
+                <div
+                    v-for="streamer in streamers"
+                    :key="streamer.id"
+                    class="streamer my-2"
+                >
                     <div class="flex">
                         <img
                             :src="streamer.profile_image_url"
                             class="mr-4 h-16 rounded-full object-contain"
                         />
-                        <div class="flex-grow min-w-0">
+                        <div
+                            class="flex-grow min-w-0"
+                            @click="() => openStreamer(streamer)"
+                        >
                             <strong>{{
                                 streamer.display_name +
                                 ' - ' +
@@ -23,10 +30,10 @@
                                 ' - ' +
                                 hoursAgo(streamer.started_at)
                             }}</strong>
-                            <p class="truncate">
+                            <p v-if="!input.hideTitle" class="truncate">
                                 {{ streamer.title.substring(0, 50) }}
                             </p>
-                            <p>{{ streamer.game_name }}</p>
+                            <p v-if="!input.hideGame" >{{ streamer.game_name }}</p>
                         </div>
                     </div>
 
@@ -37,11 +44,14 @@
             </div>
         </div>
     </div>
-    <div v-else>
+    <div v-else class="twitchFeedBlock">
         <div v-if="!twitchAuthenticated">
             <Button @click="loginTwitch">Login to twitch</Button>
         </div>
-        <p class="mt-2" label="Add streamer by pressing enter">
+        <Checkbox v-model="input.horizontal" label="Horizontal" />
+        <Checkbox v-model="input.hideTitle" label="Hide title" />
+        <Checkbox v-model="input.hideGame" label="Hide game" />
+        <p class="edit-streamers mt-2" label="Add streamer by pressing enter">
             <ListInput v-model="editStreamers" />
         </p>
     </div>
@@ -106,8 +116,33 @@ export default {
         loginTwitch() {
             twitch.login()
         },
+        openStreamer(streamer) {
+            window.open('https://www.twitch.tv/' + streamer.user_name, '_blank').focus()
+        },
     },
 }
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+.twitchFeedBlock {
+    .horizontal {
+        display: flex;
+        flex-wrap: wrap;
+        
+        .streamer {
+            max-width: 300px;
+            margin-right: 10px;
+        }
+    }
+
+    .streamer {
+        cursor: pointer;
+    }
+
+    .edit-streamers {
+        .p-button {
+            padding: 0;
+        }
+    }
+}
+</style>

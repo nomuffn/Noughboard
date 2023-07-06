@@ -19,6 +19,7 @@
                     :block="block"
                     :edit="true"
                     @submit="saveBlock"
+                    :decryptionPass="decryptionPass"
                 />
             </template>
         </section>
@@ -67,7 +68,7 @@ export default {
         ...components,
         BasicBlock,
     },
-    props: ['value', 'item', 'prefire', 'dashboardId', 'treeNodeKey'],
+    props: ['value', 'item', 'prefire', 'dashboardId', 'treeNodeKey', 'decryptionPass'],
     data() {
         return {
             allBlocks: allBlocks,
@@ -110,8 +111,11 @@ export default {
             if (this.treeNodeKey) {
                 block.treeNode = this.treeNodeKey
             }
+
+            // extract into extra file with save & load logic. For encryption
             await db.blocks.put(block).then(async (id) => {
                 block.i = block.id
+                console.log("saving block", block)
                 await db.blocks.put(block)
             })
             this.$emit('close')

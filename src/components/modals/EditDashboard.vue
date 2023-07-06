@@ -19,6 +19,10 @@
                 label="Enable tree"
                 v-model="dashboardData.useTree"
             />
+            <Checkbox
+                label="Encrypted"
+                v-model="dashboardData.encrypt"
+            />
         </section>
         <footer class="modal-card-foot">
             <Button

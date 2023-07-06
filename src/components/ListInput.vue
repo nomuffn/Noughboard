@@ -8,8 +8,8 @@
                 class="flex items-center my-1"
             >
                 <p>-</p>
+                <Button class="ml-1 p-button-text" icon="pi pi-trash" @click="remove(index)" />
                 <p class="ml-2">{{ valueInput }}</p>
-                <Button class="ml-2 p-button-text" icon="pi pi-trash" @click="remove(index)" />
             </li>
         </ul>
     </div>

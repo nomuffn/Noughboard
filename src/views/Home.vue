@@ -66,7 +66,8 @@
             <Button class="m-3" icon="pi pi-plus" @click="addBlock" />
             <Button class="m-3" icon="pi pi-file-export" @click="exportDb" />
             <Button class="m-3" icon="pi pi-file-import" @click="importDb" />
-            <Button class="m-3" icon="pi pi-cog" @click="editDashboard(false)" />
+            <Button class="m-3" icon="pi pi-cog" @click="editDashboard()" />
+            <Button class="m-3" icon="pi pi-plus" @click="editDashboard(true)" />
         </div>
 
         <div class="flex">
@@ -108,11 +109,24 @@
                 />
             </div>
 
+            <div v-if="!this.blocks.length">
+                <InputText
+                    :label="
+                        selectedDashboard.initialEncrypt
+                            ? 'Enter initial password to encrypt all blocks'
+                            : 'Enter password to decrypt dashboard'
+                    "
+                    v-model="temporaryPassword"
+                    @keyup.enter.native="loadDashboard"
+                ></InputText>
+            </div>
             <BlocksWrapper
+                v-else
                 class="flex-1"
                 :dashboard="selectedDashboard"
                 :blocks="blocks"
                 @update="loadDashboard()"
+                :decryptionPass="temporaryPassword"
             />
         </div>
     </div>
@@ -136,6 +150,8 @@ import EditTreeNode from '@/components/modals/EditTreeNode.vue'
 
 import defaultData from '@/lib/defaultData'
 
+import CryptoJS from 'crypto-js'
+
 export default {
     name: 'Home',
     data() {
@@ -144,6 +160,7 @@ export default {
             blocks: [],
             dashboards: null,
             selectedDashboard: null,
+            temporaryPassword: null,
         }
     },
     watch: {
@@ -161,7 +178,7 @@ export default {
     },
     async mounted() {
         await this.loadDashboards()
-        await this.loadDashboard()
+
         // this.$toast.open({
         //     duration: 5000,
         //     message: `danger toast test, Something's not good, also I'm on <b>bottom</b>`,
@@ -199,6 +216,20 @@ export default {
         },
     },
     methods: {
+        encrypt(value) {
+            return CryptoJS.AES.encrypt(
+                JSON.stringify(value),
+                this.temporaryPassword,
+            ).toString()
+        },
+        decrypt(value) {
+            console.log({ value })
+            var bytes = CryptoJS.AES.decrypt(value, this.temporaryPassword)
+            console.log({ bytes })
+            var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8))
+            console.log({ decryptedData })
+            return decryptedData
+        },
         async saveDashboard() {
             console.log('saveDashboard')
             await db.dashboards.put(this.selectedDashboard)
@@ -227,7 +258,11 @@ export default {
             })
         },
         async loadDashboards() {
-            this.dashboards = await db.dashboards.toArray()
+            let dashboards = await db.dashboards.toArray()
+
+            this.dashboards = dashboards.map((dashboard) => {
+                return { ...dashboard, initialEncrypt: false }
+            })
 
             if (!this.dashboards.length) {
                 await db.import(new Blob([defaultData]))
@@ -243,7 +278,6 @@ export default {
             else if (newIndex < 0) newIndex = this.dashboards.length - 1
 
             this.selectedDashboard = this.dashboards[newIndex]
-            this.loadDashboard(true)
         },
         async editDashboard(neww = false, index = this.dashboardIndex) {
             this.$buefy.modal.open({
@@ -256,7 +290,8 @@ export default {
                     close: async () => {
                         await this.loadDashboards()
                         if (neww || this.selectedDashboard >= this.dashboards.length) {
-                            this.selectedDashboard = this.dashboards.length - 1
+                            this.selectedDashboard =
+                                this.dashboards[this.dashboards.length - 1]
                         } else {
                             this.selectedDashboard = this.dashboards[this.dashboardIndex]
                         }
@@ -287,6 +322,7 @@ export default {
         async loadDashboard(switched = false) {
             console.log('loadDashboard')
             // might loop with watcher
+            // ?
             this.selectedDashboard = this.dashboards[this.dashboardIndex]
 
             if (this.selectedDashboard.useTree) {
@@ -329,7 +365,80 @@ export default {
                 })
             }
 
-            this.blocks = await blocks.toArray()
+            blocks = await blocks.toArray()
+
+            console.log(1, blocks)
+            // encryption enabled
+            if (this.selectedDashboard.encrypt) {
+                console.log(2)
+
+                // initial encrypt, encrypt all blocks inputValues
+                if (this.selectedDashboard.initialEncrypt && this.temporaryPassword) {
+                    console.log(333333)
+                    await blocks.forEach(async (block) => {
+                        block.inputValues = this.encrypt(block.inputValues)
+                        console.log({block})
+                        await db.blocks.put(block)
+                    })
+                    this.selectedDashboard.initialEncrypt = false
+                    return this.loadDashboard()
+                } else {
+                    const unencryptedBlocks = blocks.filter((block) => {
+                        return block.inputValues instanceof Object
+                    })
+                    console.log(
+                        4,
+                        unencryptedBlocks.length == blocks.length,
+                        unencryptedBlocks,
+                    )
+                    if (unencryptedBlocks.length == blocks.length) {
+                        console.log(5)
+                        // all objects are unencrypted, start it again with initialEncrypt
+                        this.selectedDashboard.initialEncrypt = true
+                        return
+                    }
+                    if (unencryptedBlocks.length > 0 && this.temporaryPassword) {
+                        console.log(6)
+                        // encrypt remaining or new blocks
+                        blocks
+                            .filter((block) => block.inputValues instanceof Object)
+                            .forEach(async (block) => {
+                                await db.blocks.put({
+                                    ...block,
+                                    inputValues: this.encrypt(block.inputValues),
+                                })
+                            })
+                        return this.loadDashboard()
+                    }
+                }
+
+                if (!this.temporaryPassword) {
+                    return
+                }
+                // console.log(7, blocks)
+                // blocks = blocks.map((block) => {
+                //     console.log(this.temporaryPassword)
+                //     console.log(block.inputValues)
+                //     console.log(this.decrypt(block.inputValues))
+                //     return { ...block, inputValues: this.decrypt(block.inputValues) }
+                // })
+            }
+
+            console.log(blocks)
+                this.blocks = blocks
+
+            // if (
+            //     blocks.filter((block) => block.inputValues instanceof Object).length ==
+            //     blocks.length
+            // ) {
+            // } else {
+            //     console.log(':/')
+            //     console.log(this.$toast)
+            //     this.$toast.open({
+            //         type: 'is-error',
+            //         message: 'Something went wrong',
+            //     })
+            // }
         },
         async exportDb() {
             let dbBlob = await db.export()
@@ -387,6 +496,27 @@ export default {
 .p-tree {
     border: none;
     padding: 0;
+}
+.tree {
     margin-right: 20px;
+}
+.dashboard-selector.p-dropdown {
+    .p-dropdown-label.p-inputtext {
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+}
+
+.p-tree.p-component {
+    padding: 0;
+    border: none;
+    background: none;
+    // .p-treenode-content {
+    //     padding-right: 30px !important;
+    // }
+
+    .p-treenode-label {
+        width: 100%;
+    }
 }
 </style>
