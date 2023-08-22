@@ -235,7 +235,7 @@ export default JSON.stringify({
                         type: { name: 'Lambda', code: 'lambda' },
                         inputValues: {
                             dailyResetTime: 1683410410540,
-                            lambda: 'const exampleDate = new Date()\n\nreturn `\n<p>Javascript code that is ran periodically.</p>\n<p>Could do whatever you need. Like fetching the latest votes on your beatsaver maps for example :)))</p>\n</br>\n<p style=\\"font-weight: bold\\" >Date</p>\n<p>${exampleDate}</p>`',
+                            lambda: 'const exampleDate = new Date()\n\nreturn `\n<p>Javascript code that is ran periodically.</p>\n<p>Could do whatever you need. Like fetching data from APIs </p>\n</br>\n<p style=\\"font-weight: bold\\" >Date</p>\n<p>${exampleDate}</p>`',
                             repeat: 5,
                         },
                         dashboard: 1,
@@ -256,14 +256,14 @@ export default JSON.stringify({
                 rows: [
                     {
                         category: 'todos',
-                        content: 'Do your mum lohl',
+                        content: 'Draw a cat',
                         details: '',
                         id: 28,
                         index: 0,
                     },
                     {
                         category: 'todos',
-                        content: 'Cleaning (lohl)',
+                        content: 'Work on muffbert',
                         details: 'the task that will never be completed',
                         id: 29,
                         index: 1,
