@@ -33,7 +33,7 @@
 
 <script>
 import { allBlocks, components } from '@/components/blocks'
-import CryptoJS from 'crypto-js'
+import { decrypt } from '@/lib/encrypt'
 
 export default {
     components: {
@@ -50,22 +50,13 @@ export default {
         },
     },
     methods: {
-        decrypt(value) {
-            console.log({ value })
-            var bytes = CryptoJS.AES.decrypt(value, this.$attrs.decryptionPass)
-            console.log({ bytes })
-            var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8))
-            console.log({ decryptedData })
-            return decryptedData
-        },
         getInputValues() {
             let values
             if (this.$attrs.decryptionPass) {
-                values = this.decrypt(this.block.inputValues)
+                values = decrypt(this.block.inputValues, this.$attrs.decryptionPass)
             } else {
                 values = this.block.inputValues
             }
-            console.log({ values })
             return values
         },
         getBlock() {

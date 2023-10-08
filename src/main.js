@@ -44,7 +44,6 @@ Vue.use(VueTimers)
 Vue.use(Dialog)
 Vue.use(Modal)
 Vue.use(Timepicker)
-
 Vue.use(PrimeVue)
 Vue.use(ConfirmationService)
 Vue.directive('tooltip', Tooltip)
@@ -59,5 +58,6 @@ Vue.component('Editor', Editor)
 Vue.component('ProgressSpinner', ProgressSpinner)
 
 Vue.prototype.$toast = ToastProgrammatic
+window.Vue = Vue // for buefy or the toasts wouldnt find the vue instance without importing the whole buefy package ♿
 
 export default main

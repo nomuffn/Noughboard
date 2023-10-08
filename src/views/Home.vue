@@ -63,11 +63,26 @@
             />
         </div>
         <div class="buttons flex mt-3 mx-4 p-3 rounded-md max-w-50 self-center">
-            <Button class="m-3" icon="pi pi-plus" @click="addBlock" />
+            <Button
+                class="m-3"
+                icon="pi pi-plus"
+                @click="addBlock"
+                :disabled="!this.blocks.length"
+            />
             <Button class="m-3" icon="pi pi-file-export" @click="exportDb" />
             <Button class="m-3" icon="pi pi-file-import" @click="importDb" />
-            <Button class="m-3" icon="pi pi-cog" @click="editDashboard()" />
-            <Button class="m-3" icon="pi pi-plus" @click="editDashboard(true)" />
+            <Button
+                class="m-3"
+                icon="pi pi-cog"
+                @click="editDashboard()"
+                :disabled="!this.blocks.length"
+            />
+            <Button
+                class="m-3"
+                icon="pi pi-plus"
+                @click="editDashboard(true)"
+                :disabled="!this.blocks.length"
+            />
         </div>
 
         <div class="flex">
@@ -109,7 +124,7 @@
                 />
             </div>
 
-            <div v-if="!this.blocks.length">
+            <div v-if="this.selectedDashboard.encrypt && !this.blocks.length">
                 <InputText
                     :label="
                         selectedDashboard.initialEncrypt
@@ -150,7 +165,7 @@ import EditTreeNode from '@/components/modals/EditTreeNode.vue'
 
 import defaultData from '@/lib/defaultData'
 
-import CryptoJS from 'crypto-js'
+import { encrypt, decrypt } from '@/lib/encrypt'
 
 export default {
     name: 'Home',
@@ -171,6 +186,7 @@ export default {
         selectedTreeNode(newval, oldval) {
             console.log('watch selectedTreeNode')
             this.loadDashboard()
+            this.saveDashboard() // for selectedTreeNode
         },
     },
     async created() {
@@ -216,20 +232,6 @@ export default {
         },
     },
     methods: {
-        encrypt(value) {
-            return CryptoJS.AES.encrypt(
-                JSON.stringify(value),
-                this.temporaryPassword,
-            ).toString()
-        },
-        decrypt(value) {
-            console.log({ value })
-            var bytes = CryptoJS.AES.decrypt(value, this.temporaryPassword)
-            console.log({ bytes })
-            var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8))
-            console.log({ decryptedData })
-            return decryptedData
-        },
         async saveDashboard() {
             console.log('saveDashboard')
             await db.dashboards.put(this.selectedDashboard)
@@ -258,11 +260,7 @@ export default {
             })
         },
         async loadDashboards() {
-            let dashboards = await db.dashboards.toArray()
-
-            this.dashboards = dashboards.map((dashboard) => {
-                return { ...dashboard, initialEncrypt: false }
-            })
+            this.dashboards = await db.dashboards.toArray()
 
             if (!this.dashboards.length) {
                 await db.import(new Blob([defaultData]))
@@ -285,7 +283,10 @@ export default {
                 component: EditDashboard,
                 hasModalCard: true,
                 trapFocus: true,
-                props: { dashboard: neww ? {} : { ...this.dashboards[index] } },
+                props: {
+                    dashboard: neww ? {} : { ...this.dashboards[index] },
+                    decryptionPass: this.temporaryPassword,
+                },
                 events: {
                     close: async () => {
                         await this.loadDashboards()
@@ -295,6 +296,10 @@ export default {
                         } else {
                             this.selectedDashboard = this.dashboards[this.dashboardIndex]
                         }
+                    },
+                    decrypt: () => {
+                        this.temporaryPassword = null
+                        this.loadDashboard()
                     },
                 },
             })
@@ -321,9 +326,8 @@ export default {
         },
         async loadDashboard(switched = false) {
             console.log('loadDashboard')
-            // might loop with watcher
-            // ?
-            this.selectedDashboard = this.dashboards[this.dashboardIndex]
+            // ? might loop with watcher
+            // ? redundant? this.selectedDashboard = this.dashboards[this.dashboardIndex]
 
             if (this.selectedDashboard.useTree) {
                 if (!this.selectedDashboard.tree) {
@@ -367,45 +371,48 @@ export default {
 
             blocks = await blocks.toArray()
 
-            console.log(1, blocks)
             // encryption enabled
+            // TODO clean this up please at some point :)
             if (this.selectedDashboard.encrypt) {
-                console.log(2)
-
-                // initial encrypt, encrypt all blocks inputValues
+                // initial encrypt, encrypt all blocks inputValues; include treenodes
                 if (this.selectedDashboard.initialEncrypt && this.temporaryPassword) {
-                    console.log(333333)
-                    await blocks.forEach(async (block) => {
-                        block.inputValues = this.encrypt(block.inputValues)
-                        console.log({block})
-                        await db.blocks.put(block)
-                    })
+                    blocks = await db.blocks
+                        .filter((block) => block.dashboard == this.selectedDashboard.id)
+                        .toArray()
+
+                    await blocks
+                        .filter((block) => {
+                            return block.inputValues instanceof Object
+                        })
+                        .forEach(async (block) => {
+                            block.inputValues = encrypt(
+                                block.inputValues,
+                                this.temporaryPassword,
+                            )
+                            await db.blocks.put(block)
+                        })
                     this.selectedDashboard.initialEncrypt = false
                     return this.loadDashboard()
                 } else {
                     const unencryptedBlocks = blocks.filter((block) => {
                         return block.inputValues instanceof Object
                     })
-                    console.log(
-                        4,
-                        unencryptedBlocks.length == blocks.length,
-                        unencryptedBlocks,
-                    )
                     if (unencryptedBlocks.length == blocks.length) {
-                        console.log(5)
                         // all objects are unencrypted, start it again with initialEncrypt
                         this.selectedDashboard.initialEncrypt = true
                         return
                     }
                     if (unencryptedBlocks.length > 0 && this.temporaryPassword) {
-                        console.log(6)
                         // encrypt remaining or new blocks
                         blocks
                             .filter((block) => block.inputValues instanceof Object)
                             .forEach(async (block) => {
                                 await db.blocks.put({
                                     ...block,
-                                    inputValues: this.encrypt(block.inputValues),
+                                    inputValues: encrypt(
+                                        block.inputValues,
+                                        this.temporaryPassword,
+                                    ),
                                 })
                             })
                         return this.loadDashboard()
@@ -415,30 +422,21 @@ export default {
                 if (!this.temporaryPassword) {
                     return
                 }
-                // console.log(7, blocks)
-                // blocks = blocks.map((block) => {
-                //     console.log(this.temporaryPassword)
-                //     console.log(block.inputValues)
-                //     console.log(this.decrypt(block.inputValues))
-                //     return { ...block, inputValues: this.decrypt(block.inputValues) }
-                // })
+
+                try {
+                    blocks.forEach((block) => {
+                        decrypt(block.inputValues, this.temporaryPassword)
+                    })
+                } catch (e) {
+                    this.temporaryPassword = null
+                    return this.$toast.open({
+                        message: 'wrong password :p',
+                        type: 'is-danger',
+                    })
+                }
             }
 
-            console.log(blocks)
-                this.blocks = blocks
-
-            // if (
-            //     blocks.filter((block) => block.inputValues instanceof Object).length ==
-            //     blocks.length
-            // ) {
-            // } else {
-            //     console.log(':/')
-            //     console.log(this.$toast)
-            //     this.$toast.open({
-            //         type: 'is-error',
-            //         message: 'Something went wrong',
-            //     })
-            // }
+            this.blocks = blocks
         },
         async exportDb() {
             let dbBlob = await db.export()

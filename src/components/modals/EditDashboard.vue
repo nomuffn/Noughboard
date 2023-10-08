@@ -15,14 +15,8 @@
                 label="Vertically compact"
                 v-model="dashboardData.verticalCompact"
             />
-            <Checkbox
-                label="Enable tree"
-                v-model="dashboardData.useTree"
-            />
-            <Checkbox
-                label="Encrypted"
-                v-model="dashboardData.encrypt"
-            />
+            <Checkbox label="Enable tree (WIP)" v-model="dashboardData.useTree" />
+            <Checkbox label="Encrypted" v-model="dashboardData.encrypt" />
         </section>
         <footer class="modal-card-foot">
             <Button
@@ -34,18 +28,14 @@
             />
 
             <Button label="Close" class="ml-auto" @click="$emit('close')" />
-            <Button
-                label="Save"
-                class="ml-2"
-                @click="save"
-                :disabled="submitDisabled"
-            />
+            <Button label="Save" class="ml-2" @click="save" :disabled="submitDisabled" />
         </footer>
     </div>
 </template>
 
 <script>
 import { db } from '@/lib/db'
+import { decrypt } from '@/lib/encrypt'
 
 export default {
     props: {
@@ -53,6 +43,7 @@ export default {
             required: false,
             default: {},
         },
+        decryptionPass: {},
     },
     data() {
         return {
@@ -65,6 +56,21 @@ export default {
     },
     methods: {
         async save() {
+            // decrypt blocks
+            if (this.dashboardData.encrypt != this.dashboard.encrypt) {
+                let blocks = await db.blocks
+                    .filter((block) => block.dashboard == this.dashboard.id)
+                    .toArray()
+                blocks = blocks.filter((block) => {
+                    return typeof block.inputValues === 'string' // dont use instanceof
+                })
+                blocks.forEach(async (block) => {
+                    block.inputValues = decrypt(block.inputValues, this.decryptionPass)
+                    await db.blocks.put(block)
+                })
+                this.$emit('decrypt')
+            }
+
             await db.dashboards.put(this.dashboardData)
             this.$emit('close')
         },
