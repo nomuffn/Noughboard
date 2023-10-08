@@ -4,16 +4,17 @@
             <p>Twitch not authenticated</p>
         </div>
         <div v-else class="flex flex-col">
-            <div v-if="!streamers.length">
+            <div v-if="streamers == null">Loading...</div>
+            <div v-else-if="!streamers.length">
                 <p>No streamers live :(</p>
             </div>
-            <div v-else :class="[input.horizontal && 'horizontal']">
+            <div v-else :class="[input.horizontal && 'flex']">
                 <div
                     v-for="streamer in streamers"
                     :key="streamer.id"
-                    class="streamer my-2"
+                    :class="['streamer my-2']"
                 >
-                    <div class="flex">
+                    <div class="flex mr-4">
                         <img
                             :src="streamer.profile_image_url"
                             class="mr-4 h-16 rounded-full object-contain"
@@ -30,10 +31,10 @@
                                 ' - ' +
                                 hoursAgo(streamer.started_at)
                             }}</strong>
-                            <p v-if="!input.hideTitle" class="truncate">
+                            <p v-if="!input.hideTitle" class="truncate max-w-[300px]">
                                 {{ streamer.title.substring(0, 50) }}
                             </p>
-                            <p v-if="!input.hideGame" >{{ streamer.game_name }}</p>
+                            <p v-if="!input.hideGame">{{ streamer.game_name }}</p>
                         </div>
                     </div>
 
@@ -45,12 +46,14 @@
         </div>
     </div>
     <div v-else class="twitchFeedBlock">
-        <div v-if="!twitchAuthenticated">
+        <div v-if="!twitchAuthenticated" class="mb-4">
             <Button @click="loginTwitch">Login to twitch</Button>
         </div>
-        <Checkbox v-model="input.horizontal" label="Horizontal" />
-        <Checkbox v-model="input.hideTitle" label="Hide title" />
-        <Checkbox v-model="input.hideGame" label="Hide game" />
+        <div class="flex">
+            <Checkbox v-model="input.horizontal" label="Horizontal" />
+            <Checkbox v-model="input.hideTitle" label="Hide title" />
+            <Checkbox v-model="input.hideGame" label="Hide game" />
+        </div>
         <p class="edit-streamers mt-2" label="Add streamer by pressing enter">
             <ListInput v-model="editStreamers" />
         </p>
@@ -81,7 +84,7 @@ export default {
     },
     data() {
         return {
-            streamers: [],
+            streamers: null,
             twitchAuthenticated: false,
             editStreamers: [],
         }
@@ -128,7 +131,7 @@ export default {
     .horizontal {
         display: flex;
         flex-wrap: wrap;
-        
+
         .streamer {
             max-width: 300px;
             margin-right: 10px;
