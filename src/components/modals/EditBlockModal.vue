@@ -6,11 +6,11 @@
             </p>
         </header>
         <section class="modal-card-body">
-
             <Dropdown
                 v-model="block.type"
                 :options="allBlocks"
                 optionLabel="name"
+                scrollHeight="500"
             />
 
             <template v-if="block.type">
@@ -24,12 +24,7 @@
             </template>
         </section>
         <footer class="modal-card-foot justify-end">
-            <Button
-                v-if="block.id"
-                label="Archive"
-                class="p-button-warning"
-                disabled
-            />
+            <Button v-if="block.id" label="Archive" class="p-button-warning" disabled />
             <Button
                 v-if="block.id"
                 :label="deleteSure ? 'Sure?' : 'Delete'"
@@ -49,11 +44,7 @@
                 class="mx-2 ml-auto p-button-secondary"
                 @click="$emit('close')"
             />
-            <Button
-                label="Save"
-                @click="saveBlock()"
-                :disabled="submitDisabled"
-            />
+            <Button label="Save" @click="saveBlock()" :disabled="submitDisabled" />
         </footer>
     </div>
 </template>
@@ -81,7 +72,6 @@ export default {
         if (this.item) this.block = structuredClone(this.item)
     },
     mounted() {
-        console.log(this)
         if (this.prefire) {
             this.block.type =
                 allBlocks.find((item) => item.code == this.prefire) || this.block.type
@@ -115,7 +105,7 @@ export default {
             // extract into extra file with save & load logic. For encryption
             await db.blocks.put(block).then(async (id) => {
                 block.i = block.id
-                console.log("saving block", block)
+                console.log('saving block', block)
                 await db.blocks.put(block)
             })
             this.$emit('close')

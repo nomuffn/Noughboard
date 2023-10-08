@@ -120,7 +120,7 @@ export default {
         },
         getDailyDate() {
             let resetTime = new Date(Date.parse(this.dailyResetTime))
-            resetTime.setDate(resetTime.getDate() - 7)
+            // ?? resetTime.setDate(resetTime.getDate() - 7)
 
             let date = new Date()
             date.setHours(resetTime.getHours(), resetTime.getMinutes(), 0)

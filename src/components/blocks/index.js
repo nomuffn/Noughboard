@@ -41,6 +41,10 @@ const allBlocks = [
         name: 'Timer (WIP)',
         code: 'timer',
     },
+    {
+        name: 'Quick add bar (WIP)', // for blocks to quickly add alarms e.g.
+        code: 'quickadd',
+    },
 ]
 
 let components = {}

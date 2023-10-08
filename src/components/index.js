@@ -7,6 +7,7 @@ function asyncComponent(path, name = null) {
 
 asyncComponent('basic/Checkbox')
 asyncComponent('basic/InputText')
+asyncComponent('basic/TimePicker')
 asyncComponent('modals/EditBlockModal')
 asyncComponent('modals/NewTaskModal')
 asyncComponent('BlocksWrapper')

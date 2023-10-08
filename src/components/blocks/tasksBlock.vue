@@ -34,13 +34,9 @@
             label="Category (also the identifier in the database rn)"
         ></InputText>
         <Checkbox v-model="input.daily" label="Daily Tasks"> Active </Checkbox>
-        <div v-if="input.daily">
-            <p>Reset at</p>
-            <b-timepicker
-                v-model="input.dailyResetTime"
-                inline
-                placeholder="Click to select..."
-            />
+        <div v-if="input.daily" class="flex mt-2 items-center">
+            <p class="font-bold mr-4">Reset at</p>
+            <TimePicker v-model="input.dailyResetTime" />
         </div>
     </div>
 </template>
@@ -103,8 +99,7 @@ export default {
             }
             const delta = date - now
 
-            var milliseconds = Math.floor((delta % 1000) / 100),
-                seconds = Math.floor((delta / 1000) % 60),
+            var seconds = Math.floor((delta / 1000) % 60),
                 minutes = Math.floor((delta / (1000 * 60)) % 60),
                 hours = Math.floor((delta / (1000 * 60 * 60)) % 24)
 

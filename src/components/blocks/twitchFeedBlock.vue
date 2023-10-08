@@ -2,6 +2,7 @@
     <div v-if="!edit" class="twitchFeedBlock">
         <div v-if="!twitchAuthenticated">
             <p>Twitch not authenticated</p>
+            <Button @click="loginTwitch">Login to twitch</Button>
         </div>
         <div v-else class="flex flex-col">
             <div v-if="streamers == null">Loading...</div>
